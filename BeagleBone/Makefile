@@ -1,7 +1,7 @@
 include ../make.inc
 CP=cp -u
 SYM=ln -f --backup=none -s 
-install: install_startup install_config /dev/ttyO1
+install: install_startup install_config /dev/ttyO1 install_fstab
 
 /dev/ttyO1:
 	@echo -n "checking if uart1 driver is installed ... "
@@ -25,6 +25,13 @@ enable-uart1-00A0.dtbo: enable-uart1.dts
 install_config: hosts
 	@echo "installing the hosts file (local dns)"
 	+$(CP) hosts /etc/hosts
-
+install_fstab:
+	@echo "removing old refferences to the sd card from fstab"
+	@grep -v "/dev/mmcblk0p1" /etc/fstab > /etc/fstab.new
+	@cp /etc/fstab /etc/fstab.old
+	@mv /etc/fstab.new /etc/fstab
+	@echo "installing fstab (setting sd mount point)"
+	@printf "/dev/mmcblk0p1\t$(DBDIR)\tvfat\tdefaults\t0 0\n" >> /etc/fstab
+	@mount -a
 clean:
 	rm -f  *~ *.swp *.dtbo
