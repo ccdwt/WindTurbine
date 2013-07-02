@@ -1,0 +1,23 @@
+
+fragment@0 {
+	target = <&am33x_pinmux>;
+	__overlay__ {
+		/* pinmux for uart1  */
+		bone_myuartXX_pins: pinmux_bone_myuartXX_pins{
+/* the uart pin config register offset from the base 0x44e10800 */
+			pinctrl-single,pins = <
+				0x184 0x00 /* 24 UART1_TXD uart1_txd OUTPUT */
+				0x180 0x20 /* 26 UART1_RXD uart1_rxd INPUT */	
+			>;
+		};
+	};
+};
+
+fragment@1 {
+	target = <&uart2>;
+	__overlay__ {
+		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&bone_myuartXX_pins>;
+	};
+};

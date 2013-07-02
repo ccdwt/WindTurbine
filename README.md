@@ -1,4 +1,3 @@
-WindTurbine
-===========
+This directory contains files and information related to the Calvin College Demonstration Wind Turbine.
 
-everything for our beaglebone black wind turbine listener.
+--Matthew Kuperus Heun, 20 May 2013

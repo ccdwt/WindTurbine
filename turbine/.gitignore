@@ -1,0 +1,20 @@
+# Compiled Source #
+#######################
+*.exe
+*.o
+a.out
+
+
+# windows stackdump files #
+*.stackdump
+
+# Logs and Databases #
+o*.log
+
+# temporary files #
+.*.*.swp
+.*.swp
+*.*~
+##################
+
+
