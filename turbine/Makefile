@@ -48,4 +48,4 @@ SIP.o : SIP.h SIP.c
 #	gcc -c usb_turbine.c
 
 clean: 
-	rm -f *.o turbine$(EXT) usb_turbine$(EXT)
+	rm -f *~ *.o turbine$(EXT) usb_turbine$(EXT) logger$(EXT)
