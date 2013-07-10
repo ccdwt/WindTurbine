@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include "SIP.h"
+#define __DEBUG
 #include "XB.h"
 #include "io.h"
 
@@ -7,22 +8,13 @@
 
 int main(int argc, char *argv[]) {
 	
-	addr64[0]=0;
-	addr64[1]=0;
-	addr64[2]=0;
-	addr64[3]=0;
-	addr64[4]=0;
-	addr64[5]=0;
-	addr64[6]=0;
-	addr64[7]=1;
-	
 	char SIP[15];
 	int cnt;
 	int input;
 	ssize_t len;
 	char BUF[256];
 #ifdef __WIND_SERIAL_H__
-	serial_port.name = "/dev/ttyS3";
+	serial_port.name = "/dev/ttyO1";
 	serial_port.baud = B115200;
 	serial_port.data_bits = 8;
 #endif

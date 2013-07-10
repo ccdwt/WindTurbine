@@ -1,7 +1,7 @@
-all: client
+all: test
 
-client: client.c weather.h
-	gcc -o client client.c
+test: test.c weather.h
+	gcc -o test test.c
 
 clean: 
-	rm -rf client client.exe *.o *~ 
+	rm -rf test test.exe *.o *~ 

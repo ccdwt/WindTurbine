@@ -1,6 +1,7 @@
 #ifndef _XB_H_
 #define _XB_H_
 
+#include <stddef.h>
 
 typedef struct {
 	size_t len;

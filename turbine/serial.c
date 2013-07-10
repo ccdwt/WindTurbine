@@ -49,7 +49,7 @@ int serial_wait_for_read(unsigned int Seconds, unsigned int USeconds){
 	int rv;
 
 	FD_ZERO(&set); // clear our fild_descriptor set;
-	FD_SET(FileDesc, &set); // add the serial port ot our filedescriptor set.
+	FD_SET(FileDesc, &set); // add the serial port to our filedescriptor set.
 	
 	timeout.tv_sec = Seconds;
 	timeout.tv_usec = USeconds;
@@ -128,7 +128,9 @@ int IO_init(){
 		perror("Invalid number of stop bits. must be either 1 or 2");
 	}
     pts.c_cc[VMIN] = 1; 		// minimum read is 1 character
-    //pts.c_cc[VTIME] = 0;
+    pts.c_cc[VTIME] = 0;
+    pts.c_cc[VINTR] = 0;		// disable interrupts;
+    pts.c_cc[VQUIT] = 0;
     pts.c_oflag &= ~ONLCR; 		// dont convert \n -> \r\n
     pts.c_iflag &= ~ICRNL; 		// same but for input
     pts.c_cflag &= ~CRTSCTS;		// disable hardware flow control;

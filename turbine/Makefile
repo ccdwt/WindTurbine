@@ -6,7 +6,16 @@ else
 	USBLIB 	= -lusb
 endif
 
-all: turbine logger
+all: turbine logger asoc at
+
+log: logger
+
+test: turbine
+
+util: asoc at
+
+at : AT.o serial.o io.o XB.o 
+	gcc -o at AT.o serial.o XB.o io.o SIP.o
 
 asoc : asoc.o serial.o io.o XB.o SIP.o
 	gcc -o asoc asoc.o serial.o XB.o io.o SIP.o
@@ -17,8 +26,8 @@ turbine : turbine.o serial.o io.o XB.o SIP.o
 logger : logger.o serial.o io.o XB.o SIP.o
 	gcc -o logger logger.o serial.o XB.o io.o SIP.o
 
-#usb_turbine : usb_turbine.o myusb.o SIP.o myusb.h 
-#	gcc -o usb_turbine usb_turbine.o myusb.o $(USBLIB)
+AT.o : AT.c io.h serial.h XB.h 
+	gcc -c AT.c
 
 asoc.o : asoc.c SIP.h io.h serial.h XB.h
 	gcc -c asoc.c

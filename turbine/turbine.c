@@ -19,14 +19,14 @@ int main(int argc, char *argv[]) {
 #endif
 	IO_init();
 	while (1){
-		XB_AT(0,"ND",NULL,0);
+	//	XB_AT(0,"ND",NULL,0);
 		for (cnt = 0; cnt < 64; cnt ++){ 
 
 			int len = SIP_Request(cnt,SIP);
 			//printf ("transmitting ..."); fflush(stdout);
 			XB_TX(cnt, SIP,len);
 			//printf ("sent. parsing..."); fflush(stdout);
-			if ((RX_data.len != 0) && (SIP_Parse(RX_data.data, RX_data.len) )) {
+			if ((RX_data.len >11) && (SIP_Parse(RX_data.data, RX_data.len) )) {
 				printf("Power output = %3d W\t", Turbine_Status.Pout);
 				printf("RPM = %3d RPM\t", Turbine_Status.AltRPM);
 				printf("Total generated = %7d Wh\t", Turbine_Status.AccWh);
@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
 					printf("\x1B[32mRUN\x1B[0m");
 				if(Turbine_Status.SysStatus & ST_WAITING)
 					printf("\x1B[33mWAITING\x1B[0m");
+				printf("                 ");
 
 				printf("\r");
 				fflush(stdout);

@@ -136,7 +136,7 @@ bool SIP_Parse(unsigned char * mem, unsigned int len){
 	//	printf (" len = %5d  ", len);
 		return true;
 	}else {
-//		printf(" crc=%3.2x%3.2x, %3.2x%3.2x | len = %d\n",crc%256,crc>>8,mem[len-4], mem[len-3], len);
+// 		printf(" crc=%3.2x%3.2x, %3.2x%3.2x | len = %d sizeof struct = %d\n",crc%256,crc>>8,mem[len-4], mem[len-3], len, sizeof(Turbine_Raw));
 		return false;
 	}	
 }
