@@ -3,6 +3,7 @@
 #include "XB.h"
 #include "io.h"
 #include <time.h>
+#include <sys/time.h>
 
 
 int main(int argc, char *argv[]) {
@@ -10,7 +11,7 @@ int main(int argc, char *argv[]) {
 	char * filename = "TurbineLog";
 	
 	char SIP[15];
-	int wait = 1; // log every 5 seconds;
+	int wait = 20; // log every 5 seconds;
 	int cnt;
 	int input;
 	time_t timer;
@@ -25,7 +26,14 @@ int main(int argc, char *argv[]) {
 	time(&timer);
 	while (1){
 		for (cnt = 0; cnt < 64; cnt ++){ 
-			while((time(NULL) - timer == 0)||(time(NULL) % wait !=0));
+			if ( time(NULL) == timer){
+				struct timeval t;
+				gettimeofday(&t,NULL);
+				int interval = (wait - (t.tv_sec%wait) )*1000000 - t.tv_usec;
+				interval = interval > 0? interval:0;
+				usleep(interval ); 
+			}
+			//while((time(NULL) - timer == 0)||(time(NULL) % wait !=0));
 			int len = SIP_Request(cnt,SIP);
 			XB_TX(cnt, SIP,len);
 			if ((RX_data.len != 0) && (SIP_Parse(RX_data.data, RX_data.len) )) {
