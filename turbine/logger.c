@@ -31,6 +31,7 @@ int main(int argc, char *argv[]) {
 				gettimeofday(&t,NULL);
 				int interval = (wait - (t.tv_sec%wait) )*1000000 - t.tv_usec;
 				interval = interval > 0? interval:0;
+				printf("sleeping %lf\n",(double)interval/1000000);
 				usleep(interval ); 
 			}
 			//while((time(NULL) - timer == 0)||(time(NULL) % wait !=0));

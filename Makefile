@@ -6,13 +6,14 @@ build: weather turbine modbus
 
 test: turbine/turbine modbus/test weather/test
 
-clean: weather/clean turbine/clean modbus/clean
+clean: weather/clean turbine/clean modbus/clean BeagleBone/clean
 	rm -rf bin/* *~ *.swp
 
 ######### install  #####################
 install: install_BBB install_noarch
 
 install_BBB: warning
+	+$(MAKE) install -C BeagleBone
 
 install_noarch: install_loggers install_db
 
@@ -21,7 +22,18 @@ install_loggers: loggers
 	@cp weather/test $(BIN)/weather_log
 	@echo "installing turbine_log"
 	@cp turbine/logger $(BIN)/turbine_log
-#	cp modbus/logger $(BIN)/power_log
+	@echo "installing power_log"
+	@cp modbus/log.pl $(BIN)/power_log
+	@cp modbus/config.xml $(BIN)/config.xml
+
+install_test: tests
+	@echo "installing weather_test"
+	@cp weather/test $(BIN)/weather_test
+	@echo "installing turbine_test"
+	@cp turbine/turbine $(BIN)/turbine_test
+	@echo "installing power_test"
+	@cp modbus/test.pl$(BIN)/power_test
+	@cp modbus/config.xml $(BIN)/config.xml
 	
 install_db:
 	@echo "install_db: not implemented yet"
@@ -29,7 +41,9 @@ install_db:
 warning: scripts/warn.sh
 	scripts/warn.sh
 	
-loggers: weather/test turbine/logger
+loggers: weather/test turbine/logger modbus/log
+
+tests: weather/test turbine/turbine modbus/test
 	
 ######### weather/ #####################
 weather: weather/test
@@ -74,3 +88,6 @@ modbus/log:
 modbus/clean:
 	+$(MAKE) clean -C modbus
 
+######## BeagleBone ####################
+BeagleBone/clean:
+	+$(MAKE) clean -C BeagleBone

@@ -9,7 +9,7 @@ else
 	echo "ERROR: you do not appear to have either dos2unix, sed, or tr. Cannot continue"
 	exit 1
 fi
-echo "cmd = $CMD"
+# echo "cmd = $CMD"
 if [ -e $1 ]; then
 	bash -c "$CMD"
 else
