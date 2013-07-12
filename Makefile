@@ -19,7 +19,7 @@ install_noarch: install_loggers install_db
 
 install_loggers: loggers
 	@echo "installing weather_log"
-	@cp weather/test $(BIN)/weather_log
+	@cp weather/log $(BIN)/weather_log
 	@echo "installing turbine_log"
 	@cp turbine/logger $(BIN)/turbine_log
 	@echo "installing power_log"
@@ -41,15 +41,19 @@ install_db:
 warning: scripts/warn.sh
 	scripts/warn.sh
 	
-loggers: weather/test turbine/logger modbus/log
+loggers: weather/log turbine/logger modbus/log
 
 tests: weather/test turbine/turbine modbus/test
 	
 ######### weather/ #####################
-weather: weather/test
-	
-weather/test:
+weather: weather/test weather/log
 	+$(MAKE) -C weather
+
+weather/test:
+	+$(MAKE) test -C weather
+
+weather/log:
+	+$(MAKE) log -C weather
 
 weather/clean:
 	@$(MAKE) clean -C weather
@@ -58,36 +62,40 @@ weather/clean:
 
 turbine/util: turbine/asoc turbine/at
 
-turbine:
+turbine: force
 	+$(MAKE) -C turbine
 
-turbine/turbine:
+turbine/turbine: force
 	+$(MAKE) turbine -C turbine
 
-turbine/logger:
+turbine/logger: force
 	+$(MAKE) logger -C turbine
 
-turbine/asoc:
+turbine/asoc: force
 	+$(MAKE) asoc -C turbine
 
-turbine/at:
+turbine/at: force
 	+$(MAKE) at -C turbine
 
-turbine/clean:
+turbine/clean: force
 	@$(MAKE) clean -C turbine
 ######## modbus/ #######################
 
 modbus: modbus/test modbus/log
 
-modbus/test:
+modbus/test: force
 	+$(MAKE) -C modbus
 
-modbus/log:
+modbus/log: force
 	+$(MAKE) log -C modbus
 
-modbus/clean:
+modbus/clean: force
 	+$(MAKE) clean -C modbus
 
 ######## BeagleBone ####################
-BeagleBone/clean:
+BeagleBone/clean: force
 	+$(MAKE) clean -C BeagleBone
+
+
+force:
+	true
