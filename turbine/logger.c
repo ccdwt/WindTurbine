@@ -5,6 +5,15 @@
 #include <time.h>
 #include <sys/time.h>
 
+int usage(char* message, char * me){
+	int ret = 0;
+	if (message != NULL){
+		ret = 1;
+		printf("error: %s\n",message);
+	}
+	printf("%s [logfile]\n", me);
+	return ret;
+}
 
 int main(int argc, char *argv[]) {
 	
@@ -17,6 +26,11 @@ int main(int argc, char *argv[]) {
 	time_t timer;
 	ssize_t len;
 	char BUF[256];
+	if (argc == 2){
+		filename = argv[1];
+	} else if ( argc > 2 ){
+		return usage("Too many Arguments",argv[0]);
+	}
 	FILE *log = fopen(filename,"wt");
 #ifdef __WIND_SERIAL_H__
 	serial_port.name = "/dev/ttyO1";
@@ -31,7 +45,7 @@ int main(int argc, char *argv[]) {
 				gettimeofday(&t,NULL);
 				int interval = (wait - (t.tv_sec%wait) )*1000000 - t.tv_usec;
 				interval = interval > 0? interval:0;
-				printf("sleeping %lf\n",(double)interval/1000000);
+// 				printf("sleeping %lf\n",(double)interval/1000000);
 				usleep(interval ); 
 			}
 			//while((time(NULL) - timer == 0)||(time(NULL) % wait !=0));
