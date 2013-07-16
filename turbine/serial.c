@@ -38,7 +38,9 @@ void IO_write(char *cmd, size_t length){
 
 ssize_t IO_read(char * buf, size_t count, unsigned int uSec){
 	if (serial_wait_for_read(uSec/1000000,uSec%1000000) > 0){
+		fcntl(FileDesc,F_SETFL,0| O_NONBLOCK);// nonblocking io;
 		return read(FileDesc,(void*) buf, count);
+		fcntl(FileDesc,F_SETFL,0);
 	}
 	return(0);
 }

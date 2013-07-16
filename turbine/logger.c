@@ -3,6 +3,7 @@
 #include "XB.h"
 #include "io.h"
 #include <time.h>
+#include <unistd.h>
 #include <sys/time.h>
 
 int usage(char* message, char * me){
@@ -45,11 +46,17 @@ int main(int argc, char *argv[]) {
 				gettimeofday(&t,NULL);
 				int interval = (wait - (t.tv_sec%wait) )*1000000 - t.tv_usec;
 				interval = interval > 0? interval:0;
-// 				printf("sleeping %lf\n",(double)interval/1000000);
+ 				printf("sleeping %lf\n",(double)interval/1000000);
 				usleep(interval ); 
 			}
 			//while((time(NULL) - timer == 0)||(time(NULL) % wait !=0));
 			int len = SIP_Request(cnt,SIP);
+			if (time(NULL) -timer>= wait*2){
+				printf("doing a io restart @ %u\n",time(NULL));
+				IO_close();
+				IO_init();
+				time(&timer); timer -= wait; // wait a little to do the next io restart.
+			}
 			XB_TX(cnt, SIP,len);
 			if ((RX_data.len != 0) && (SIP_Parse(RX_data.data, RX_data.len) )) {
 				time(&timer); // record successful packet
