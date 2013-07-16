@@ -48,7 +48,7 @@ while(1){
 		push @line, @{GetGroup($group)} ;
 	}
 	print LOG_FILE time . ", " .join(', ', @line) . "\n";
-	print  join(', ', @line) . "\n";
+##	print  join(', ', @line) . "\n";
 }
 
 close(LOG);
@@ -109,16 +109,21 @@ sub GetGroup{
 			my $len = $_->{LENGTH};
 			my $name = $_->{NAME};
 			my $value;
+			my $signed = undef; #unsigned
+
+			if ($group->{SIGNED} eq "TRUE"){ 
+				#if (unpack("C",substr($data,$start,1)) != 0){
+					$signed = "TRUE"; # signed
+			}
 
 			for (0 .. $len-1){
-				$value += ($len-$_ ** (65536)) * 
-					unpack("n",substr( $data, ($start +$_)*2+9, 2));
-			}
-
-			print unpack("n",substr($data,9,2)) . "\n" if $value >100;
-			if (($group->{SIGNED} eq "TRUE") && (unpack("n",substr($data,0,9)) != 0)) {
-				$value -= (65536) ** ($len);
-			}
+				my $v = unpack("n",substr( $data,($start + $_) *2+9,2));
+				if ($signed && $v > (65536/2)){
+					$v+= -65536;
+				}
+				$value += ($len-$_ ** (65536)) * $v;
+			}	
+	
 
 			$value *= $group->{MULTIPLIER};
 			push @return, "$value $units";
