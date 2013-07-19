@@ -10,6 +10,7 @@
 #include <string.h>
 #include <time.h>
 #include <netdb.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/select.h>
 #include <netinet/in.h>
@@ -21,7 +22,7 @@
 #define PORT "22222" // the port client will be connecting to 
 #define MAXDATASIZE 500 // max number of bytes we can get at once 
 
-int interval = 10; //interval in seconds;
+int interval = 2; //interval in seconds;
 
 void printInHex(char* arry, int len){
 	int i =0;
@@ -57,19 +58,28 @@ buffer write_read(char*data,int len,int sockfd){
     FD_ZERO(&set);
     FD_SET(sockfd,&set);
     
-    timeout.tv_sec = 1; // default timeout 2sec;
-    timeout.tv_usec = 0; //default timeout 2.00 sec;
+    timeout.tv_sec = 1; // default timeout 1sec;
+    timeout.tv_usec = 0; //default timeout 1.00 sec;
 
-    while(send(sockfd,data,len,0) == -1);
-
+    if (fcntl(sockfd,F_GETFD) == -1 || errno ==EBADF){
+    	ret.error = -2; // bad file descriptor
+	return ret;
+    }
+    int i;
+    while((ret.error = send(sockfd,data,len,MSG_NOSIGNAL)) < 0){
+	printf("ret.error = %d\n",ret.error);
+	if (i++ > 5){
+		ret.error = -4;// cannot write
+		break;
+	}
+    }
+	if(ret.error < 0){
+		return ret;
+	}
     ret.error = select(sockfd+1,&set,NULL,NULL,&timeout);
     if (ret.error > 0){
  	ret.len = read(sockfd,ret.data,MAXDATASIZE-1);
 
-	//if ((ret.len = recv(sockfd, ret.data, MAXDATASIZE-1,0)) == -1) {
-        //	ret.error=-1;
-	//	printf("we got a real error");
-        //}
     }
     //printf("length recieved is %d\n",ret.len);
     return ret;
@@ -87,25 +97,35 @@ buffer get_weather(char * cmd, int sockfd){
     cmd1[6]='\n';
     cmd1[7]='\0';
 
+    printf("starting wakeup .."); fflush(stdout);
     do{
     	ret = write_read("VER\n",4,sockfd);
+	if (ret.error <= -2 || ret.error == 4294967293 ){
+		printf("Bad FD\n");
+		if (ret.error == 4294967293 ) ret.error=-2;
+		return ret;
+	}
     }while (ret.error <= 0);
-    //printf("appeared to have gotten the version. packet length %d\n",ret.len);
+    printf("done\n");
     memcpy (version,ret.data,ret.len);
     version[ret.len] = '\0';
     //printf("version is %s",version);
-    //printf("sending cmd %s",cmd1);
+    printf("sending cmd %s ",cmd1); fflush(stdout);
 
     do{
 	ret = write_read(cmd1,7,sockfd);
-        //printf("code is %d\n",ret.error);
+        printf("code is %d\n",ret.error);
+	if (ret.error <= -2){
+		printf("Bad FD\n");
+		return ret;
+	}
     }while(ret.error<=0);
 
-    //printf("recieved %d bytes\n",ret.len);
+    printf("recieved %d bytes\n",ret.len);
     return ret;
 }
 
-find_start(buffer *data){
+void find_start(buffer *data){
 
     while(data->len > 0){
 	data->data = &data->data[1];
@@ -159,36 +179,47 @@ int queryLog(char* hostname, FILE * log){
 
     inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
             s, sizeof s);
-    //printf("client: connecting to %s\n", s);
+    printf("client: connecting to %s\n", s);
 
     freeaddrinfo(servinfo); // all done with this structure
 
 
-/***	HILOWS	***/
+/***	LOOP 1	***/
     buffer data; 
     data = get_weather("LOOP 1",sockfd);
-    find_start(&data);
-    memcpy(&loop,data.data,data.len);
-    fprintf(log,"%u,seconds",time(NULL));
-    fprintf(log,",%.3f,in. Hg",(float)loop.barometer/1000);
-    fprintf(log,",%.2f,\u00B0F", ((float)loop.outsideTemperature/10));
-    fprintf(log,",%u,mph", loop.windSpeed);
-    fprintf(log,",%d,mph",loop.tenMinAvgWS);
-    fprintf(log,",%u,\u00B0", loop.windDirection);
-    fprintf(log,",%d,%%",loop.outsideHumidity);
-    fprintf(log,",%.2f,in./hr.",((float)loop.rainRate/100));
-    fprintf(log,",%u,UV index",loop.uvIndex);
-    fprintf(log,",%u,W/m\u00B2",loop.solarRadiation);
-    fprintf(log,",%.2f,in.",((float)loop.dayRain/100)); 
-    fprintf(log,",%.2f,in.",((float)loop.monthRain/100)); 
-    fprintf(log,",%.2f,in.",((float)loop.yearRain/100)); 
-    fprintf(log,",%.2f,in.",((float)loop.dayET/100)); 
-    fprintf(log,",%.2f,in.",((float)loop.monthET/100)); 
-    fprintf(log,",%.2f,in.",((float)loop.yearET/100)); 
-    fprintf(log,",%u,batt",loop.transmitterBat);
-    fprintf(log,",%.2f,V",(float)loop.consoleBattery/100);
-    fprintf(log,"\n");
-    fflush(log);
+    printf("got data from get_weather\n");
+    if (data.error >= 0){
+    	find_start(&data);
+    	if (data.len >= sizeof(loop)){
+		memcpy(&loop,data.data,data.len);
+		fprintf(log,"%u,seconds",time(NULL));
+		fprintf(log,",%.3f,in. Hg",(float)loop.barometer/1000);
+		fprintf(log,",%.2f,\u00B0F", ((float)loop.outsideTemperature/10));
+		fprintf(log,",%u,mph", loop.windSpeed);
+		fprintf(log,",%d,mph",loop.tenMinAvgWS);
+		fprintf(log,",%u,\u00B0", loop.windDirection);
+		fprintf(log,",%d,%%",loop.outsideHumidity);
+		fprintf(log,",%.2f,in./hr.",((float)loop.rainRate/100));
+		fprintf(log,",%u,UV index",loop.uvIndex);
+		fprintf(log,",%u,W/m\u00B2",loop.solarRadiation);
+		fprintf(log,",%.2f,in.",((float)loop.dayRain/100)); 
+		fprintf(log,",%.2f,in.",((float)loop.monthRain/100)); 
+		fprintf(log,",%.2f,in.",((float)loop.yearRain/100)); 
+		fprintf(log,",%.2f,in.",((float)loop.dayET/100)); 
+		fprintf(log,",%.2f,in.",((float)loop.monthET/100)); 
+		fprintf(log,",%.2f,in.",((float)loop.yearET/100)); 
+		fprintf(log,",%u,batt",loop.transmitterBat);
+		fprintf(log,",%.2f,V",(float)loop.consoleBattery/100);
+		fprintf(log,"\n");
+		fflush(log);
+	} else {
+		close(sockfd);
+		return -3; // packet too short
+	}
+    } else  {
+	    close(sockfd);
+	    return data.error;
+    }
     close(sockfd);
 
     return 0;
@@ -208,9 +239,10 @@ int main(int argc, char *argv[])
 
     FILE * log = fopen(filename, "wt");
     while(1){
-//     printf("sleeping %u seconds\n", interval - (time(NULL) % interval));	    
+    printf("sleeping %u seconds\n", interval - (time(NULL) % interval));	    
     sleep (interval - (time(NULL)%interval));
-    queryLog(argv[1],log);
+    printf("getting info\n");
+    printf("Log returned %u\n", queryLog(argv[1],log));
     }
     fclose(log);
 }
