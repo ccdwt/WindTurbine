@@ -10,16 +10,34 @@ use constant MAX_RECV_LEN => 65536;
 
 ##################### reading configuration from xml file #################################
 
-my $file = 'config.xml';             #Configuration file
+my $file = '/usr/src/WindTurbine/bin/config.xml';             #Configuration file
 my $xs1 = XML::Simple->new();
 my $doc = $xs1->XMLin($file)
 or die "Modbus client : problem with congig file: $file\n";;
 my $simple_tcp_port = $doc->{SERVER}->{PEERPORT};
-my $remote_host = $doc->{SERVER}->{PEERADDR};
-my $logFile = $doc->{LOGFILE};
+my $LOGDIR = $doc->{SERVER}->{LOGDIR};
+my $PIDDIR = $doc->{SERVER}->{PIDDIR};
+
+my $DEBUG = "false";
+
+my $calledName = $0;
+print "called as $calledName\n" if $DEBUG;
+my $remote_host; 
+my $logfile;
+my $pidfile;
+if ($calledName =~ m/rowland/){
+	$remote_host = "rowland_pwr";
+	$logfile = "$LOGDIR/power_rowland.csv";
+	$pidfile = "$PIDDIR/power_rowland.pid";
+} elsif ($calledName =~ m/turbine/){
+	$remote_host = "turbine_pwr";
+	$logfile = "$LOGDIR/power_turbine.csv";
+	$pidfile = "$PIDDIR/power_turbine.pid";
+}
 my $remote = shift || $remote_host;
-my $remote_port = shift || $simple_tcp_port;
-my $log = shift || $logFile;
+my $remote_port = $simple_tcp_port;
+my $log = shift  || $logfile;
+my $lock = shift || $pidfile;
 my $polls_time = $doc->{REGISTERS}->{POLLSTIME};
 my $trans_serv = getprotobyname( 'tcp' );
 $remote_host = gethostbyname( $remote )
@@ -31,23 +49,43 @@ my $time = time() - $polls_time;
 
 #################### Open Log file #####################################################
 
+open (LOCK, ">$lock") or die "cannot open lockfile: $lock";
+	print LOCK "$$\n";
+close(LOCK);
+
 open (LOG_FILE, ">$log") or die "cant open $log for logging";
 LOG_FILE->autoflush(1);
 
-print LOG_FILE "starting log on " . localtime . "\n";
+#print LOG_FILE "starting log on " . localtime . "\n";
 
 #################### end of Log File ###################################################
 
 #################### Start Loop ########################################################
 
 while(1){
+########### check lockfile ########################
+
+	open (LOCK, "<$lock") or die "cannot open lockfile: $lock";
+	my $lockPid = <LOCK>;
+	chomp $lockPid;
+	if ($lockPid ne $$){
+		# we are no longer the holder of the lockfile
+		exit(1);
+	}
+	close(LOCK);
+
+################ end check lockfile ################
 	my @line;
+	my $line;
 	sleep ($polls_time - (time() - $time)) unless (time()-$time > $polls_time); 
 	foreach my $group (@{$doc->{REGISTERS}->{GROUP}}){
 		$time = time();
 		push @line, @{GetGroup($group)} ;
 	}
-	print LOG_FILE time . ", " .join(', ', @line) . "\n";
+	if (scalar(@line) == 16){
+		$line =sprintf time . "," .join(',', @line) ;
+		printf LOG_FILE $line . "\n";
+	}
 ##	print  join(', ', @line) . "\n";
 }
 
@@ -126,7 +164,7 @@ sub GetGroup{
 	
 
 			$value *= $group->{MULTIPLIER};
-			push @return, "$value $units";
+			push @return, "$value";
 #			print "$value $units";
 		}
 
