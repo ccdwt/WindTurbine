@@ -20,14 +20,24 @@
 #include "weather.h"
 
 #define PORT "22222" // the port client will be connecting to 
-#define MAXDATASIZE 500 // max number of bytes we can get at once 
+#define MAXDATASIZE 1024 // max number of bytes we can get at once 
+
+#ifndef PIDDIR
+#define PIDDIR "/usr/src/WindTurbine/pids"
+#endif
+
+#ifndef LOGDIR
+#define LOGDIR "/usr/src/WindTurbine/logs"
+#endif
+
+static char BUFFER[MAXDATASIZE];
 
 int interval = 2; //interval in seconds;
 
 void printInHex(char* arry, int len){
 	int i =0;
 	for (i=0;i<len;i++){
-		printf("%3.2x",(unsigned char)arry[i]);
+	fprintf(stderr,"%3.2x",(unsigned char)arry[i]);
 	}
 }
 
@@ -48,9 +58,8 @@ void *get_in_addr(struct sockaddr *sa)
 buffer write_read(char*data,int len,int sockfd){
     fd_set set;
     struct timeval timeout;
-    buffer ret;
-    static char buf[MAXDATASIZE];
-    ret.data = buf;
+    static buffer ret;
+    ret.data = BUFFER;
 
     ret.len = 0;
     ret.error = 0;
@@ -67,7 +76,7 @@ buffer write_read(char*data,int len,int sockfd){
     }
     int i;
     while((ret.error = send(sockfd,data,len,MSG_NOSIGNAL)) < 0){
-	printf("ret.error = %d\n",ret.error);
+fprintf(stderr,"ret.error = %d\n",ret.error);
 	if (i++ > 5){
 		ret.error = -4;// cannot write
 		break;
@@ -81,7 +90,7 @@ buffer write_read(char*data,int len,int sockfd){
  	ret.len = read(sockfd,ret.data,MAXDATASIZE-1);
 
     }
-    //printf("length recieved is %d\n",ret.len);
+    fprintf(stderr,"length recieved is %d\n",ret.len);
     return ret;
 }
 
@@ -97,31 +106,31 @@ buffer get_weather(char * cmd, int sockfd){
     cmd1[6]='\n';
     cmd1[7]='\0';
 
-    printf("starting wakeup .."); fflush(stdout);
+   fprintf(stderr,"starting wakeup .."); fflush(stdout);
     do{
     	ret = write_read("VER\n",4,sockfd);
 	if (ret.error <= -2 || ret.error == 4294967293 ){
-		printf("Bad FD\n");
+	fprintf(stderr,"Bad FD\n");
 		if (ret.error == 4294967293 ) ret.error=-2;
 		return ret;
 	}
     }while (ret.error <= 0);
-    printf("done\n");
+   fprintf(stderr,"done\n");
     memcpy (version,ret.data,ret.len);
     version[ret.len] = '\0';
-    //printf("version is %s",version);
-    printf("sending cmd %s ",cmd1); fflush(stdout);
+    fprintf(stderr,"version is %s",version);
+   fprintf(stderr,"sending cmd %s ",cmd1); fflush(stdout);
 
     do{
 	ret = write_read(cmd1,7,sockfd);
-        printf("code is %d\n",ret.error);
+       fprintf(stderr,"code is %d\n",ret.error);
 	if (ret.error <= -2){
-		printf("Bad FD\n");
+	fprintf(stderr,"Bad FD\n");
 		return ret;
 	}
     }while(ret.error<=0);
 
-    printf("recieved %d bytes\n",ret.len);
+   fprintf(stderr,"recieved %d bytes\n",ret.len);
     return ret;
 }
 
@@ -179,7 +188,7 @@ int queryLog(char* hostname, FILE * log){
 
     inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
             s, sizeof s);
-    printf("client: connecting to %s\n", s);
+   fprintf(stderr,"client: connecting to %s\n", s);
 
     freeaddrinfo(servinfo); // all done with this structure
 
@@ -187,7 +196,7 @@ int queryLog(char* hostname, FILE * log){
 /***	LOOP 1	***/
     buffer data; 
     data = get_weather("LOOP 1",sockfd);
-    printf("got data from get_weather\n");
+   fprintf(stderr,"got data from get_weather\n");
     if (data.error >= 0){
     	find_start(&data);
     	if (data.len >= sizeof(loop)){
@@ -200,7 +209,7 @@ int queryLog(char* hostname, FILE * log){
 		fprintf(log,",%u,\u00B0", loop.windDirection);
 		fprintf(log,",%d,%%",loop.outsideHumidity);
 		fprintf(log,",%.2f,in./hr.",((float)loop.rainRate/100));
-		fprintf(log,",%u,UV index",loop.uvIndex);
+		fprintf(log,",%.1f,UV index",(float)loop.uvIndex/10);
 		fprintf(log,",%u,W/m\u00B2",loop.solarRadiation);
 		fprintf(log,",%.2f,in.",((float)loop.dayRain/100)); 
 		fprintf(log,",%.2f,in.",((float)loop.monthRain/100)); 
@@ -229,6 +238,7 @@ int queryLog(char* hostname, FILE * log){
 int main(int argc, char *argv[])
 {
     char * filename = "log.csv";
+    char line[15];
     if (argc < 2 || argc > 3) {
         fprintf(stderr,"usage: %s hostname [logfile]\n", argv[0]);
         exit(1);
@@ -236,14 +246,49 @@ int main(int argc, char *argv[])
     if (argc == 3){
 	    filename = argv[2];
     }
+    pid_t pid;
+    pid = fork();
+    if (pid < 0){
+	    exit(2);
+    }
+    if (pid > 0){
+	    // sucessful fork;
+	    FILE* pidFile = fopen(PIDDIR"/weather_log.pid", "wt");
+	    printf("started daemon with pid: %d\n", pid);
+	    fprintf(pidFile, "%d\n", pid);
+	    exit(0);
+    }
+    // we are the child if we got here
 
     FILE * log = fopen(filename, "wt");
-    while(1){
-    printf("sleeping %u seconds\n", interval - (time(NULL) % interval));	    
-    sleep (interval - (time(NULL)%interval));
-    printf("getting info\n");
-    printf("Log returned %u\n", queryLog(argv[1],log));
-    }
+    stderr = freopen(LOGDIR"/weather_error.log", "wt",stderr);
+     close(STDOUT_FILENO);
+     close(STDIN_FILENO);
+     
+     FILE * pidFile = fopen(PIDDIR"/weather_log.pid", "r");
+     fread(line,1,15,pidFile);
+     pid = atoi(line);
+     fprintf(stderr, "pid was %d, getpid = %d, %d\n",pid, getpid(), pid==getpid());
+     fflush(stderr);
+     fclose(pidFile);
+
+    while (pid == getpid()){
+	fprintf(stderr,"sleeping %u seconds\n", interval - (time(NULL) % interval));	    
+	fflush(stderr);
+    	sleep (interval - (time(NULL)%interval));
+   	fprintf(stderr,"getting info\n");
+   	fprintf(stderr,"Log returned %u\n", queryLog(argv[1],log));
+
+
+	     FILE * pidFile = fopen(PIDDIR"/weather_log.pid", "r");
+	     fread(line,1,15,pidFile);
+	     pid = atoi(line);
+	     fprintf(stderr, "pid was %d\n",pid);
+	     fclose(pidFile);
+
+    } 
+    fprintf(stderr, "i'm done\n");
+
     fclose(log);
 }
 
