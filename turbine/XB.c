@@ -6,9 +6,8 @@
 
 unsigned char addr64[8] = {0x00,0x13,0xa2,0x00,0x40,0x32,0xcd,0x83};
 unsigned char addr16[2] = {0xff,0xfe};
-buffer RX_data = (buffer){ .len = 0};
+buffer RX_data = {0};
 
-#define DEBUG
 
 void parse(char* packet, size_t len){
 	packet_t latest;
