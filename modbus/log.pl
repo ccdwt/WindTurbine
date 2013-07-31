@@ -16,8 +16,6 @@ my $xs1 = XML::Simple->new();
 my $doc = $xs1->XMLin($file)
 or die "Modbus client : problem with config file: $file\n";;
 my $simple_tcp_port = $doc->{SERVER}->{PEERPORT};
-my $LOGDIR = $doc->{SERVER}->{LOGDIR};
-my $PIDDIR = $doc->{SERVER}->{PIDDIR};
 
 my $DEBUG = "false";
 
@@ -28,12 +26,12 @@ my $logfile;
 my $pidfile;
 if ($calledName =~ m/rowland/){
 	$remote_host = "rowland_pwr";
-	$logfile = "$LOGDIR/power_rowland.csv";
-	$pidfile = "$PIDDIR/power_rowland.pid";
+	$logfile = "LOGDIR/power_rowland.csv";
+	$pidfile = "PIDDIR/power_rowland.pid";
 } elsif ($calledName =~ m/turbine/){
 	$remote_host = "turbine_pwr";
-	$logfile = "$LOGDIR/power_turbine.csv";
-	$pidfile = "$PIDDIR/power_turbine.pid";
+	$logfile = "LOGDIR/power_turbine.csv";
+	$pidfile = "PIDDIR/power_turbine.pid";
 }
 my $remote = shift || $remote_host;
 my $remote_port = $simple_tcp_port;
@@ -118,19 +116,19 @@ sub GetGroup{
 	my $start_add = $group->{STARTADDR} - 40001;
 	my $pack_val = unpack("H*",pack("n",$start_add));
 	my $units = $group->{UNITS};
-	my @buffor = ();
-	$buffor[0 ] = chr(0 ); # 1
-	$buffor[1 ] = chr(0 );
-	$buffor[2 ] = chr(0 );
-	$buffor[3 ] = chr(0 );
-	$buffor[4 ] = chr(0 );
-	$buffor[5 ] = chr(6 );
-	$buffor[6 ] = chr(1 );
-	$buffor[7 ] = chr(3 );
-	$buffor[8 ] = chr(hex (substr $pack_val, 0, 2));
-	$buffor[9 ] = chr(hex (substr $pack_val, 2, 2));
-	$buffor[10] = chr(0 );
-	$buffor[11] = chr($quantity);
+	my @buffer = ();
+	$buffer[0 ] = chr(0 ); # 1
+	$buffer[1 ] = chr(0 );
+	$buffer[2 ] = chr(0 );
+	$buffer[3 ] = chr(0 );
+	$buffer[4 ] = chr(0 );
+	$buffer[5 ] = chr(6 );
+	$buffer[6 ] = chr(1 );
+	$buffer[7 ] = chr(3 );
+	$buffer[8 ] = chr(hex (substr $pack_val, 0, 2));
+	$buffer[9 ] = chr(hex (substr $pack_val, 2, 2));
+	$buffer[10] = chr(0 );
+	$buffer[11] = chr($quantity);
 
 #################### end of modbus frame ###############################################
 
@@ -145,7 +143,7 @@ sub GetGroup{
 ################### server connected ###################################################
 
 ################### reading registers ################################################## 
-	my $data = join('',@buffor);                           #Modbus frame to scalar
+	my $data = join('',@buffer);                           #Modbus frame to scalar
 	send( TCP_SOCK, $data, 0 )
 	or warn "Modbus client : problem with send: $!\n";
 	my $from_who = recv( TCP_SOCK, $data, MAX_RECV_LEN, 0 );

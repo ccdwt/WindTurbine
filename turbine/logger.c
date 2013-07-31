@@ -15,6 +15,10 @@
 #define LOGDIR "/usr/src/WindTurbine/logs"
 #endif
 
+#ifndef SERIAL
+#define SERIAL "/dev/ttyO1"
+#endif
+
 int usage(char* message, char * me){
 	int ret = 0;
 	if (message != NULL){
@@ -64,7 +68,7 @@ int main(int argc, char *argv[]) {
 
 
 #ifdef __WIND_SERIAL_H__
-	serial_port.name = "/dev/ttyO1";
+	serial_port.name = SERIAL;
 	serial_port.baud = B115200;
 #endif
 	IO_init();

@@ -30,9 +30,17 @@
 #define LOGDIR "/usr/src/WindTurbine/logs"
 #endif
 
+#ifndef WEATHER_INTERVAL
+#define WEATHER_INTERVAL 2
+#endif
+
+#ifndef WEATHER_HOST
+#define WEATHER_HOST "weather"
+#endif
+
 static char BUFFER[MAXDATASIZE];
 
-int interval = 2; //interval in seconds;
+int interval = WEATHER_INTERVAL; //interval in seconds;
 
 void printInHex(char* arry, int len){
 	int i =0;
@@ -238,10 +246,15 @@ int queryLog(char* hostname, FILE * log){
 int main(int argc, char *argv[])
 {
     char * filename = "log.csv";
+    char * remote_host = WEATHER_HOST;
+
     char line[15];
-    if (argc < 2 || argc > 3) {
-        fprintf(stderr,"usage: %s hostname [logfile]\n", argv[0]);
+    if (argc < 1 || argc > 3) {
+        fprintf(stderr,"usage: %s [hostname] [logfile]\n", argv[0]);
         exit(1);
+    }
+    if (argc >= 2){
+	    remote_host = argv[1];
     }
     if (argc == 3){
 	    filename = argv[2];
@@ -277,7 +290,7 @@ int main(int argc, char *argv[])
 	fflush(stderr);
     	sleep (interval - (time(NULL)%interval));
    	fprintf(stderr,"getting info\n");
-   	fprintf(stderr,"Log returned %u\n", queryLog(argv[1],log));
+   	fprintf(stderr,"Log returned %u\n", queryLog(remote_host,log));
 
 
 	     FILE * pidFile = fopen(PIDDIR"/weather_log.pid", "r");
