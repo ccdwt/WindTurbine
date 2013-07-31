@@ -2,7 +2,8 @@
 use strict;
 use IO::Socket;
 use XML::Simple;
-use threads;
+use warnings;
+use Proc::Daemon;
 
 use constant MAX_RECV_LEN => 65536;
 
@@ -10,10 +11,10 @@ use constant MAX_RECV_LEN => 65536;
 
 ##################### reading configuration from xml file #################################
 
-my $file = '/usr/src/WindTurbine/bin/config.xml';             #Configuration file
+my $file = "CONFIGDIR/config.xml";             #Configuration file
 my $xs1 = XML::Simple->new();
 my $doc = $xs1->XMLin($file)
-or die "Modbus client : problem with congig file: $file\n";;
+or die "Modbus client : problem with config file: $file\n";;
 my $simple_tcp_port = $doc->{SERVER}->{PEERPORT};
 my $LOGDIR = $doc->{SERVER}->{LOGDIR};
 my $PIDDIR = $doc->{SERVER}->{PIDDIR};
@@ -47,6 +48,23 @@ my $time = time() - $polls_time;
 
 #################### end of configurations #############################################
 
+#################### Daemon init   #####################################################
+
+my $daemon = Proc::Daemon->new(
+		pid_file => $lock,
+);
+my $childPid = $daemon->Init;
+
+my $continue =1;
+if ($childPid){
+	print "started Daemon with pid $childPid\n";
+	$continue=0;
+}
+
+$SIG{TERM} = sub{ $continue = 0};
+
+#################### End Daemon Init ###################################################
+
 #################### Open Log file #####################################################
 
 open (LOCK, ">$lock") or die "cannot open lockfile: $lock";
@@ -62,7 +80,7 @@ LOG_FILE->autoflush(1);
 
 #################### Start Loop ########################################################
 
-while(1){
+while($continue){
 ########### check lockfile ########################
 
 	open (LOCK, "<$lock") or die "cannot open lockfile: $lock";
@@ -89,7 +107,7 @@ while(1){
 ##	print  join(', ', @line) . "\n";
 }
 
-close(LOG);
+close(LOG_FILE);
 
 sub GetGroup{
 	my $group = shift;
