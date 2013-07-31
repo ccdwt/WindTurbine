@@ -5,10 +5,9 @@
 #include <time.h>
 #include <stdbool.h>
 
-
-#define _LOGDIR_ "/usr/src/WindTurbine/logs"
-//internal  DateTime, 
-//turbine_sip ,PowerOutKW, RPM
+#ifndef LOGDIR
+#define LOGDIR "/usr/src/WindTurbine/logs"
+#endif
 
 
 
@@ -23,12 +22,6 @@ char * previous_line(FILE* fd, char * line);
 void turbine_logfile(long int now);
 void weather_logfile(long int now);
 void power_logfile(long int now, int which); // 0 = turbine, 1 = rowland
-
-// breaking down 
-//
-//
-//
-
 
 
 void append (char * orig, char* piece){
@@ -197,15 +190,15 @@ int csv(char* input, char ** argv){
 
 void turbine_logfile(long int now){
 	unsigned int RPM = 0;
-	unsigned int PowerOutKw = 0;
+	double PowerOutKw = 0;
 	long int timestamp;
 	char buf[1024];
 	char * argv[78];
 	FILE * fd;
 #ifdef _DEBUG
-	printf (_LOGDIR_"/turbine_log.csv\n");
+	printf (LOGDIR"/turbine_log.csv\n");
 #endif
-	if ((fd = fopen(_LOGDIR_"/turbine_log.csv", "rb")) != NULL){
+	if ((fd = fopen(LOGDIR"/turbine_log.csv", "rb")) != NULL){
 		int count = 0;
 		while(1){
 			char * line = previous_line(fd,buf);
@@ -221,7 +214,7 @@ void turbine_logfile(long int now){
 				break;
 			}
 			RPM += (unsigned) atoi(argv[18]);
-			PowerOutKw += atol(argv[12]);
+			PowerOutKw +=(float) atol(argv[12]) / 1000; // <- W to kW
 #ifdef _DEBUG
 			printf ("got t=%u,rpm = %u, pout = %d\n", atol(argv[0]), atol(argv[18]), atol(argv[12]));
 #endif
@@ -230,7 +223,7 @@ void turbine_logfile(long int now){
 		RPM /= count;
 		PowerOutKw /= count;
 		append(fields, ",RPM,PowerOutKw");
-	       	sprintf(buf, ",%u,%d",RPM, PowerOutKw);
+	       	sprintf(buf, ",%u,%.3f",RPM, PowerOutKw);
 		append(values, buf);
 
 	}
@@ -239,13 +232,13 @@ void turbine_logfile(long int now){
 //turbine_pwr PwrMeterkWTotalReal, PwrMeterkWhImport, PwrMeterkWhExport, PwrMeterkWhTotal, PwrMeterkWhNet
 //rowland_pwr RowlandkWTotalReal, RowlandkWhImport, RowlandkWhExport, RowlandkWhTotal, RowlandkWhNet
 void power_logfile(long int now, int which){ // 0 = turbine, 1 = rowland
-	double kWTotalReal;
-	int kWhImport;
-	int kWhExport;
-	int kWhTotal;
-	int kWhNet;
+	double kWTotalReal= 0;
+	int kWhImport= 0;
+	int kWhExport=0;
+	int kWhTotal=0;
+	int kWhNet=0;
 	FILE * fd;
-	char * filename = which==0?_LOGDIR_"/power_turbine.csv":_LOGDIR_"/power_rowland.csv";
+	char * filename = which==0?LOGDIR"/power_turbine.csv":LOGDIR"/power_rowland.csv";
 	long int timestamp;
 	char buf[1024];
 	char * argv[19];
@@ -289,22 +282,22 @@ void power_logfile(long int now, int which){ // 0 = turbine, 1 = rowland
 
 //weather Barometer, OutSideTemp, WindSpeed, tenMinAgvWind, WindDir, OutsideHumidity, RainRate, SolarRad, DayRain, DayET, UVIndex
 void weather_logfile(long int now){
-	float barometer;
-	float outtemp;
-	unsigned int windSpeed;
-	int tenMinAvgWS;
-	unsigned int windDirection;
-	int outsideHumidity;
-	float rainRate;
-	unsigned int solarRadiation;
-	float dayRain;
-	float dayET;
-	float uvIndex;
+	float barometer = 0;
+	float outtemp = 0;
+	unsigned int windSpeed = 0;
+	int tenMinAvgWS= 0;
+	unsigned int windDirection=0;
+	int outsideHumidity=0;
+	float rainRate=0;
+	unsigned int solarRadiation=0;
+	float dayRain=0;
+	float dayET=0;
+	float uvIndex=0;
 	FILE * fd;
 	long int timestamp;
 	char buf[1024];
 	char * argv[100];
-	if ((fd = fopen(_LOGDIR_"/weather_log.csv", "rb")) != NULL){
+	if ((fd = fopen(LOGDIR"/weather_log.csv", "rb")) != NULL){
 		int count = 0;
 		while (1){
 			char * line = previous_line(fd, buf);
@@ -326,7 +319,9 @@ void weather_logfile(long int now){
 			dayRain		+= atof(argv[20]);
 			dayET		+= atof(argv[26]);
 			count ++;
-// 			printf ("barometer = %lf\n",barometer);
+#ifdef _DEBUG
+ 			printf ("solarRadiation = %d, %d \n",atoi(argv[18]));
+#endif
 		}
 	barometer	/= count;
         outtemp 	/= count;
@@ -339,7 +334,9 @@ void weather_logfile(long int now){
         solarRadiation	/= count;
         dayRain		/= count;
         dayET		/= count;
-//	printf ("count = %d, barometer = %.3f\n", count, barometer);
+#ifdef _DEBUG
+	printf ("count = %d, solarradiation = %d\n", count, solarRadiation);
+#endif
 	append(fields, ",Barometer,OutSideTemp,WindSpeed,tenMinAgvWind,WindDir,OutsideHumidity,RainRate,SolarRad,DayRain,DayET,UVIndex");
 	sprintf(buf,",%.3f,%.2f,%u,%d,%u,%d,%.2f,%u,%.2f,%.2f,%.1f",barometer,outtemp,windSpeed,tenMinAvgWS,windDirection,outsideHumidity,rainRate,solarRadiation,dayRain,dayET,uvIndex);
 	append(values,buf);
