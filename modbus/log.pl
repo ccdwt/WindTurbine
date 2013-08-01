@@ -11,7 +11,7 @@ use constant MAX_RECV_LEN => 65536;
 
 ##################### reading configuration from xml file #################################
 
-my $file = "CONFIGDIR/config.xml";             #Configuration file
+my $file = CONFIGDIR . "/config.xml";             #Configuration file
 my $xs1 = XML::Simple->new();
 my $doc = $xs1->XMLin($file)
 or die "Modbus client : problem with config file: $file\n";;
@@ -26,12 +26,12 @@ my $logfile;
 my $pidfile;
 if ($calledName =~ m/rowland/){
 	$remote_host = "rowland_pwr";
-	$logfile = "LOGDIR/power_rowland.csv";
-	$pidfile = "PIDDIR/power_rowland.pid";
+	$logfile = LOGDIR . "/power_rowland.csv";
+	$pidfile = PIDDIR . "/power_rowland.pid";
 } elsif ($calledName =~ m/turbine/){
 	$remote_host = "turbine_pwr";
-	$logfile = "LOGDIR/power_turbine.csv";
-	$pidfile = "PIDDIR/power_turbine.pid";
+	$logfile = LOGDIR . "/power_turbine.csv";
+	$pidfile = PIDDIR . "/power_turbine.pid";
 }
 my $remote = shift || $remote_host;
 my $remote_port = $simple_tcp_port;
@@ -48,30 +48,27 @@ my $time = time() - $polls_time;
 
 #################### Daemon init   #####################################################
 
-my $daemon = Proc::Daemon->new(
-		pid_file => $lock,
-);
-my $childPid = $daemon->Init;
+
+my $childPid = Proc::Daemon::Init();
 
 my $continue =1;
 if ($childPid){
 	print "started Daemon with pid $childPid\n";
-	$continue=0;
+	$continue = 0;
 }
-
 $SIG{TERM} = sub{ $continue = 0};
 
 #################### End Daemon Init ###################################################
 
 #################### Open Log file #####################################################
-
+if ($continue){
 open (LOCK, ">$lock") or die "cannot open lockfile: $lock";
 	print LOCK "$$\n";
 close(LOCK);
 
 open (LOG_FILE, ">$log") or die "cant open $log for logging";
 LOG_FILE->autoflush(1);
-
+}
 #print LOG_FILE "starting log on " . localtime . "\n";
 
 #################### end of Log File ###################################################
@@ -105,7 +102,7 @@ while($continue){
 ##	print  join(', ', @line) . "\n";
 }
 
-close(LOG_FILE);
+close(LOG_FILE) unless ($childPid);
 
 sub GetGroup{
 	my $group = shift;
