@@ -8,6 +8,14 @@ write: write_toDB.c
 debug: write_toDB.c
 	gcc $(CCFLAGS) -o debug write_toDB.c -lsqlite3 -D _DEBUG
 
+install_cron:
+	@echo "Installing cron entries for write_db"
+	@$(SCRIPTS)/cron_update "db_write" "* * * * * $(BIN)/db_write $(DBDIR)/test.db"
+
+install_db: write
+	@echo "Installing write_db"
+	@$(CP) write $(BIN)/db_write
+
 clean: 
-	rm -f *.swp write *.o *~ 
+	rm -f *.swp write debug *.o *~  
 
