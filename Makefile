@@ -1,4 +1,4 @@
-BIN="bin/"
+include make.inc
 
 all: build
 
@@ -6,7 +6,7 @@ build: weather turbine modbus
 
 test: turbine/turbine modbus/test weather/test
 
-clean: weather/clean turbine/clean modbus/clean BeagleBone/clean
+clean: weather/clean turbine/clean modbus/clean BeagleBone/clean db/clean
 	rm -rf bin/* *~ *.swp
 
 ######### install  #####################
@@ -17,14 +17,11 @@ install_BBB: warning
 
 install_noarch: install_loggers install_db
 
-install_loggers: loggers
-	@echo "installing weather_log"
-	@cp weather/log $(BIN)/weather_log
+install_loggers: loggers install_modbus
+#	@echo "installing weather_log"
+#	@cp weather/log $(BIN)/weather_log
 	@echo "installing turbine_log"
 	@cp turbine/logger $(BIN)/turbine_log
-	@echo "installing power_log"
-	@cp modbus/log.pl $(BIN)/power_log
-	@cp modbus/config.xml $(BIN)/config.xml
 
 install_test: tests
 	@echo "installing weather_test"
@@ -35,8 +32,13 @@ install_test: tests
 	@cp modbus/test.pl$(BIN)/power_test
 	@cp modbus/config.xml $(BIN)/config.xml
 	
-install_db:
-	@echo "install_db: not implemented yet"
+install_db: db/install_db db/install_cron
+
+install_modbus: 
+	@$(MAKE) install_log -C modbus
+
+install_weather:
+	@$(MAKE) install_log -C weather
 
 warning: scripts/warn.sh
 	scripts/warn.sh
@@ -91,6 +93,19 @@ modbus/log: force
 
 modbus/clean: force
 	+$(MAKE) clean -C modbus
+############## DB ######################
+
+db/write: force
+	+$(MAKE) write -C db
+
+db/install_db: force
+	+$(MAKE) install_db -C db
+
+db/install_cron: force
+	+$(MAKE) install_cron -C db
+
+db/clean: force
+	+$(MAKE) clean -C db
 
 ######## BeagleBone ####################
 BeagleBone/clean: force
