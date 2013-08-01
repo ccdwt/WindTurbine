@@ -11,7 +11,7 @@ and everything should be installed
 
 # todo
 	1. add Monit to makefile 0/1
-	2. add startup scripts to install 2/4
+	2. add startup scripts to install 4/4 # DONE
 	3. add cron jobs to install 1/2
-	4. add configuration to db_write and dropbox 1/2
+	4. add configuration to turbine, modbus, weather, db_write, and dropbox 4/5
 

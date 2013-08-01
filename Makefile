@@ -17,11 +17,7 @@ install_BBB: warning
 
 install_noarch: install_loggers install_db
 
-install_loggers: loggers install_modbus
-#	@echo "installing weather_log"
-#	@cp weather/log $(BIN)/weather_log
-	@echo "installing turbine_log"
-	@cp turbine/logger $(BIN)/turbine_log
+install_loggers: loggers install_modbus install_weather install_turbine
 
 install_test: tests
 	@echo "installing weather_test"
@@ -39,6 +35,9 @@ install_modbus:
 
 install_weather:
 	@$(MAKE) install_log -C weather
+
+install_turbine:
+	@$(MAKE) install_log -C turbine
 
 warning: scripts/warn.sh
 	scripts/warn.sh
