@@ -39,7 +39,7 @@ deps:
 		echo "installing IO::Socket";\
 		opkg install libxml-parser-perl perl-module-io-socket;\
 		echo "installing Proc::Daemon";\
-		echo "install Proc::Daemon" | perl -MCPAN -e "shell";\
+		perl -MCPAN -e "install Proc::Daemon";\
 		fi
 
 clean:
