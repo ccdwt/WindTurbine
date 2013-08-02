@@ -2,11 +2,11 @@ include ../make.inc
 
 all: write
 
-write: write_toDB.c
-	gcc $(CCFLAGS) $(LOG_DEF) -o write write_toDB.c -lsqlite3
+write: write_toDB.c sqlite3
+	gcc $(CCFLAGS) $(LOG_DEF) -o write write_toDB.c $(pkg-config --libs sqlite3)
 
-debug: write_toDB.c
-	gcc $(CCFLAGS) -o debug write_toDB.c -lsqlite3 -D _DEBUG
+debug: write_toDB.c sqlite3
+	gcc $(CCFLAGS) -o debug write_toDB.c $(pkg-config --libs sqlite3) -D _DEBUG
 
 install_cron:
 	@echo "Installing cron entries for write_db"
@@ -15,7 +15,12 @@ install_cron:
 install_db: write
 	@echo "Installing write_db"
 	@$(CP) write $(BIN)/db_write
-
+sqlite3:
+	@echo -n "checking for sqlite3 .. "
+	@if pkg-config --exists sqlite3; then echo "Found!"; else \
+		echo "not found. installing libsqlite3 libsqlite3-dev";\
+		opkg install libsqlite3 libsqlite3-dev;\
+		fi
 clean: 
 	rm -f *.swp write debug *.o *~  
 
