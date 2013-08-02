@@ -1,0 +1,33 @@
+diff -rupN monit-5.5.1/Makefile monit-working/Makefile
+--- monit-5.5.1/Makefile	2013-08-02 19:17:32.162172512 +0000
++++ monit-working/Makefile	2013-08-02 19:07:51.658266193 +0000
+@@ -204,7 +204,7 @@ AUTOMAKE = ${SHELL} /usr/src/monit/monit
+ AWK = gawk
+ CC = gcc
+ CCDEPMODE = depmode=none
+-CFLAGS = -Wno-address -Wno-pointer-sign -g -O2 -Wall -Wunused -Wno-unused-label -funsigned-char -D_GNU_SOURCE -std=c99 -D _REENTRANT -I
++CFLAGS = -Wno-address -Wno-pointer-sign -g -O2 -Wall -Wunused -Wno-unused-label -funsigned-char -D_GNU_SOURCE -std=c99 -D _REENTRANT
+ CPP = gcc -E
+ CPPFLAGS = 
+ CYGPATH_W = echo
+@@ -227,9 +227,9 @@ INSTALL_PROGRAM = ${INSTALL}
+ INSTALL_SCRIPT = ${INSTALL}
+ INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
+ LD = /usr/arm-angstrom-linux-gnueabi/bin/ld
+-LDFLAGS = -ldl
++LDFLAGS =  -rdynamic
+ LIBOBJS = 
+-LIBS = -lpam -lpthread -lcrypt -lresolv -lnsl  /libssl.a /libcrypto.a
++LIBS = -lpam -lpthread -lcrypt -lresolv -lnsl -lcrypto -lssl
+ LIBTOOL = $(SHELL) $(top_builddir)/libtool
+ LIPO = 
+ LN_S = ln -s
+@@ -307,7 +307,7 @@ psdir = ${docdir}
+ sbindir = ${exec_prefix}/sbin
+ sharedstatedir = ${prefix}/com
+ srcdir = .
+-sslincldir = 
++sslincldir = /usr/include 
+ ssllibdir = 
+ subdirs =  libmonit
+ sysconfdir = ${prefix}/etc
