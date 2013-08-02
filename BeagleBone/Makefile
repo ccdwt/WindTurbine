@@ -1,3 +1,4 @@
+include ../make.inc
 CP=cp -u
 SYM=ln -f --backup=none -s 
 install: install_startup install_config
@@ -9,6 +10,8 @@ install_startup: uart1 install_uart
 	@+$(SYM) /etc/init.d/uart1 /etc/rc3.d/S89uart1
 	@+$(SYM) /etc/init.d/uart1 /etc/rc4.d/S89uart1
 	@+$(SYM) /etc/init.d/uart1 /etc/rc5.d/S89uart1
+	@/etc/init.d/uart1
+
 
 install_uart: enable-uart1-ooAo.dtbo
 	+$(CP) enable-uart1-ooAo.dtbo /lib/firmware/
