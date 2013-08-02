@@ -15,7 +15,7 @@ install: install_BBB install_noarch
 install_BBB: warning
 	+$(MAKE) install -C BeagleBone
 
-install_noarch: install_loggers install_db
+install_noarch: install_loggers install_db install_backup
 
 install_loggers: loggers install_modbus install_weather install_turbine
 
@@ -29,6 +29,8 @@ install_test: tests
 	@cp modbus/config.xml $(BIN)/config.xml
 	
 install_db: db/install_db db/install_cron
+
+install_backup: utilities/dropbox
 
 install_modbus: 
 	@$(MAKE) install_log -C modbus
@@ -109,7 +111,10 @@ db/clean: force
 ######## BeagleBone ####################
 BeagleBone/clean: force
 	+$(MAKE) clean -C BeagleBone
+########################################
 
+utilities/dropbox: force
+	+$(MAKE) install -C utilities/dropbox
 
 force:
 	true

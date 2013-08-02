@@ -1,4 +1,4 @@
-PWD := $(shell pwd| sed -e 's!/\(db\|modbus\|turbine\|weather\|utilities\)!!')
+PWD := $(shell pwd| sed -e 's!/\(db\|modbus\|turbine\|weather\|utilities/dropbox\|utilities/monit\)!!')
 
 CCFLAGS := -g -std=gnu99
 BIN := $(PWD)/bin
@@ -8,6 +8,10 @@ PIDDIR := $(PWD)/pids
 DBDIR := $(PWD)/db
 WEATHER_INTERVAL := 20
 WEATHER_HOST := weather
+TURBINE_INTERVAL:= 20
+DB_APP_KEY := 'pg85fmq2slj3p7j'
+DB_APP_SECRET := 'ex3whqzzabg6w75'
+DB_TOKEN_FILE := DropBoxToken.txt
 SERIAL := /dev/ttyO1
 
 CONFIG_DEF := -D CONFIGDIR=\"$(CONFIGDIR)\"
