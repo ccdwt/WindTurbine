@@ -11,7 +11,7 @@ test: test.c weather.h
 weather: startup.m4
 	m4 $(BIN_DEF) $(LOG_DEF) $(PID_DEF) startup.m4 > weather
 
-install_log:
+install_log: weather
 	@echo "Installing binary"
 	@$(CP) log $(BIN)/weather_log
 	@echo "Installing startup script"
