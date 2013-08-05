@@ -6,8 +6,10 @@ build: weather turbine modbus
 
 test: turbine/turbine modbus/test weather/test
 
-clean: weather/clean turbine/clean modbus/clean BeagleBone/clean db/clean
-	rm -rf bin/* *~ *.swp
+clean: weather/clean turbine/clean modbus/clean BeagleBone/clean db/clean monit/clean dropBox/clean
+	rm -rf *~ *.swp
+
+#uninstall: weather/uninstall turbine/uninstall modbus/uninstall BeagleBone/uninstall db/uninstall monit/uninstall dropBox/uninstall
 
 ######### install  #####################
 install: install_BBB install_noarch
@@ -30,7 +32,7 @@ install_test: tests
 	
 install_db: db/install_db db/install_cron
 
-install_backup: utilities/dropbox
+install_backup: dropBox/install
 
 install_modbus: 
 	@$(MAKE) install_log -C modbus
@@ -113,8 +115,15 @@ BeagleBone/clean: force
 	+$(MAKE) clean -C BeagleBone
 ########################################
 
-utilities/dropbox: force
+dropBox/install: force
 	+$(MAKE) install -C utilities/dropbox
+
+dropBox/clean: force
+	+$(MAKE) clean -C utilities/dropbox
+
+
+monit/clean: force
+	+$(MAKE) clean -C utilities/monit
 
 force:
 	true
