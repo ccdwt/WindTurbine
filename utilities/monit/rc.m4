@@ -250,7 +250,7 @@ set httpd port 2812 and
 #
 
 # Check Turbine_log
-check process turbine_log with pidfile /usr/src/WindTurbine/pids/turbine_log.pid
+check process turbine_log with pidfile `'PIDDIR`'/turbine_log.pid
   start program = "/etc/init.d/turbine start" 
   stop program = "/etc/init.d/turbine stop"
   if 5 restarts within 5 cycles then alert
@@ -260,7 +260,7 @@ check process turbine_log with pidfile /usr/src/WindTurbine/pids/turbine_log.pid
 
 #check Turbine_log heartbeat
 
-check file turbine_logfile with path /usr/src/WindTurbine/logs/turbine_log.csv 
+check file turbine_logfile with path `'LOGDIR`'/turbine_log.csv 
   start program = "/etc/init.d/turbine start" 
   stop program = "/etc/init.d/turbine stop"
   if timestamp > 90 seconds then restart
@@ -268,14 +268,14 @@ check file turbine_logfile with path /usr/src/WindTurbine/logs/turbine_log.csv
   
 #check Power_log heartbeat
 
-check file power_turbine_logfile with path /usr/src/WindTurbine/logs/power_turbine.csv 
+check file power_turbine_logfile with path `'LOGDIR`'/power_turbine.csv 
   start program = "/etc/init.d/pwr_turbine start"
   stop program = "/etc/init.d/pwr_turbine stop"
   if timestamp > 90 seconds then restart
   depends on power_turbine
   
 #check Power_log
-check process power_turbine with pidfile /usr/src/WindTurbine/pids/power_turbine.pid
+check process power_turbine with pidfile `'PIDDIR`'/power_turbine.pid
   start program = "/etc/init.d/pwr_turbine start"
   stop program = "/etc/init.d/pwr_turbine stop"
   if 5 restarts within 5 cycles then alert
@@ -285,14 +285,14 @@ check process power_turbine with pidfile /usr/src/WindTurbine/pids/power_turbine
 
 #check Power_log heartbeat
 
-check file power_rowland_logfile with path /usr/src/WindTurbine/logs/power_rowland.csv 
+check file power_rowland_logfile with path `'LOGDIR`'/power_rowland.csv 
   start program = "/etc/init.d/pwr_rowland start"
   stop program = "/etc/init.d/pwr_rowland stop"
   if timestamp > 90 seconds then restart
   depends on power_rowland
   
 #check Power_log
-check process power_rowland with pidfile /usr/src/WindTurbine/pids/power_rowland.pid
+check process power_rowland with pidfile `'PIDDIR`'/power_rowland.pid
   start program = "/etc/init.d/pwr_rowland start"
   stop program = "/etc/init.d/pwr_rowland stop"
   if 5 restarts within 5 cycles then alert
@@ -302,7 +302,7 @@ check process power_rowland with pidfile /usr/src/WindTurbine/pids/power_rowland
 
 
 #weather
-check process weather_log with pidfile /usr/src/WindTurbine/pids/weather_log.pid
+check process weather_log with pidfile `'PIDDIR`'/weather_log.pid
   start program = "/etc/init.d/weather start"
   stop program = "/etc/init.d/weather stop"
   if 5 restarts within 5 cycles then alert
@@ -310,7 +310,7 @@ check process weather_log with pidfile /usr/src/WindTurbine/pids/weather_log.pid
   if changed Ppid 5 times within 5 cycles then alert
   if not exist 1 times within 1 cycles then restart
 
-check file weather_logfile with path /usr/src/WindTurbine/logs/weather_log.csv
+check file weather_logfile with path `'LOGDIR`'/weather_log.csv
   start program = "/etc/init.d/weather start"
   stop program = "/etc/init.d/weather stop"
   if timestamp > 90 seconds then restart
@@ -318,7 +318,7 @@ check file weather_logfile with path /usr/src/WindTurbine/logs/weather_log.csv
   depends on weather_log
 
 #database
-check file db_file with path /usr/src/WindTurbine/db/test.db
+check file db_file with path `'DBDIR`'/test.db
   if timestamp > 1 hour then alert
 
 #sshd
