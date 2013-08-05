@@ -104,6 +104,17 @@ struct hl8{	// High Low 8byte
 	uint16_t yearHigh	__attribute__ ((packed));
 };
 
+struct hl80{	// High Low 80 byte
+	uint8_t dayLow[8];
+	uint8_t dayHigh[8];
+	uint16_t timeHigh[8]	__attribute__ ((packed));
+	uint16_t timeLow[8]	__attribute__ ((packed));
+	uint8_t monthHigh[8];
+	uint8_t monthLow[8];
+	uint8_t yearHigh[8];
+	uint8_t yearLow[8];
+};
+
 typedef struct{
 	struct hl16 barometer;
 	struct hl5 wind;
@@ -118,7 +129,7 @@ typedef struct{
 	struct hl5 UV;			
 	struct hl10 rainRate;		
 	char extraTemps[150];	
-	char extraHums[80];		// replace
+	struct hl80 extraHums;		// replace
 	char soilMoisture[40];
 	char leafWetness[40];
 	char crc[2];

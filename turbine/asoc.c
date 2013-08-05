@@ -1,6 +1,6 @@
 #include <stddef.h>
 #include "SIP.h"
-#define __DEBUG
+#define DEBUG
 #include "XB.h"
 #include "io.h"
 

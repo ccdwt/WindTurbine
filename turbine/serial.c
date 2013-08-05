@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include "serial.h"
 
+int serial_wait_for_read(unsigned int Seconds, unsigned int USeconds);
 static struct termios 	pots;
 int			FileDesc;
 struct serial_port_options serial_port = {NULL,B9600,8,1,0,-1};

@@ -1,6 +1,7 @@
 #include "XB.h"
 #include "io.h"
 #include <string.h>
+#include <stdlib.h>
 
 void er(char * m){
 	fprintf(stderr,"error: %s\n", m);

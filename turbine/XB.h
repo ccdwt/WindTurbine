@@ -15,8 +15,8 @@ typedef struct {
 } packet_t;
 
 typedef struct{
-	unsigned char data [2048];
 	size_t len;
+	unsigned char data [2048];
 } buffer;
 	
 extern unsigned char addr64[8];

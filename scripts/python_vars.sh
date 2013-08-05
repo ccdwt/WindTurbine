@@ -4,7 +4,7 @@ IN="$1"
 OUT="$2"
 
 #### find the last use in the file
-line="$(grep -n ^use $IN | tail -n 1)"
+line="$(grep -n import $IN | tail -n 1)"
 LINES="$(wc -l $IN | awk '{ print $1 }')"
 LINENUM="${line%%:*}"
 
@@ -15,7 +15,7 @@ echo "###################### CONSTANTS #################" >> $OUT
 echo "" >> $OUT
 
 for DEF in ${@:3}; do 
-	echo "use constant $DEF;" >> $OUT
+	echo "$DEF" >> $OUT
 done
 
 echo "" >> $OUT

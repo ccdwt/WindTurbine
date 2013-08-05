@@ -104,7 +104,7 @@ buffer get_weather(char * cmd, int sockfd){
     return ret;
 }
 
-find_start(buffer *data){
+void find_start(buffer *data){
 
     while(data->len > 0){
 	data->data = &data->data[1];
@@ -170,13 +170,14 @@ int main(int argc, char *argv[])
 
 
 /***	HILOWS	***/
-    printf("sizeof(hilow)=%d\n",sizeof(hilow));
     buffer data = get_weather("HILOWS",sockfd);
     find_start(&data);
     memcpy(&hilow,data.data,data.len);
     printf("daily high wind speed = %umph\n", hilow.wind.day);
     printf("daily high temperature = %.2f F\n",((float)hilow.outTemp.dayHigh/10));
     printf("daily low DP = %d F\n",hilow.dewPoint.dayLow);
+    printf("mothly high Humididty = %u%%\n", hilow.extraHums.monthHigh[0]);
+    printf("daily Low Humidity = %u%%\n", hilow.extraHums.dayLow[0]);
     data = get_weather("LOOP 1",sockfd);
     find_start(&data);
     memcpy(&loop,data.data,data.len);

@@ -7,4 +7,6 @@
 153.106.8.21	rowland_pwr	# rowland house siemens power meter
 153.106.112.48	turbine_pwr	# turbine base  siemens power meter
 153.106.112.7	weather		# weather station ip. port 22222
-
+140.211.169.179 feeds.angstrom-distribution.org
+67.228.31.146	registry.npmjs.org
+133.242.129.236	ifconfig.me
