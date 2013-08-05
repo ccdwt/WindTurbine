@@ -45,7 +45,7 @@ void append (char * orig, char* piece){
 
 int main(int argc, char ** argv){
 	char cmd[2048];
-	char * db_file = "test.db" ;
+	char * db_file = DBDIR"/test.db" ;
 	kill_other_instances(argv[0]);
 	previous_line(NULL, NULL); // initialize values
 	fields[0]=0;

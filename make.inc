@@ -2,10 +2,10 @@ PWD := $(shell pwd| sed -e 's!/\(db\|modbus\|turbine\|weather\|utilities/dropbox
 
 CCFLAGS := -g -std=gnu99
 BIN := $(PWD)/bin
-CONFIGDIR := $(PWD)/bin
-LOGDIR := $(PWD)/logs
-PIDDIR := $(PWD)/pids
-DBDIR := $(PWD)/db
+CONFIGDIR := /usr/local/etc
+LOGDIR := /usr/local/logs
+PIDDIR := /var/run
+DBDIR := /usr/local/turbine_DB
 WEATHER_INTERVAL := 20
 WEATHER_HOST := weather
 TURBINE_INTERVAL:= 20

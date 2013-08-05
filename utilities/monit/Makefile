@@ -12,10 +12,11 @@ make: patch
 	$(MAKE) all -C monit-5.5.1
 
 patch: monit-5.5.1/Makefile monit-bbb.patch
-	cd monit-5.5.1; patch < ../monit-bbb.patch
+	cd monit-5.5.1; if patch -N --dry-run --silent < ../monit-bbb.patch &>/dev/null; \
+		then patch < ../monit-bbb.patch; fi
 
 monit-5.5.1/Makefile: monit-5.5.1/ deps
-	cd monit-5.5.1; ./configure --with-ssl-static=/usr/lib
+	if [ ! -e monit-5.5.1/Makefile ]; then cd monit-5.5.1; ./configure --with-ssl-static=/usr/lib; fi
 
 deps:
 	@echo -n "checking openssl .. "

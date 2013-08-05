@@ -1,8 +1,0 @@
-#!/bin/sh
-set -e
-
-sleep 5 # wait for everyting to get in the right places
-echo uart2pinmux > /sys/devices/bone_capemgr.9/slots
-
-exit 0
-

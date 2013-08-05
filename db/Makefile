@@ -3,10 +3,10 @@ include ../make.inc
 all: write
 
 write: write_toDB.c sqlite3
-	gcc $(CCFLAGS) $(LOG_DEF) -o write write_toDB.c $(shell pkg-config --libs sqlite3)
+	gcc $(CCFLAGS) $(LOG_DEF) $(DB_DEF) -o write write_toDB.c $(shell pkg-config --libs sqlite3)
 
 debug: write_toDB.c sqlite3
-	gcc $(CCFLAGS) -o debug write_toDB.c $(shell pkg-config --libs sqlite3) -D _DEBUG
+	gcc $(CCFLAGS) $(LOG_DEF) $(DB_DEF) -o debug write_toDB.c $(shell pkg-config --libs sqlite3) -D _DEBUG
 
 install_cron:
 	@echo "Installing cron entries for write_db"

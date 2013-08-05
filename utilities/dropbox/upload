@@ -8,11 +8,18 @@ import shlex
 import sys
 
 from dropbox import client, rest
+###################### CONSTANTS #################
 
-# XXX Fill in your consumer key and secret below
-# You can find these at http://www.dropbox.com/developers/apps
-APP_KEY = 'pg85fmq2slj3p7j'
-APP_SECRET = 'ex3whqzzabg6w75'
+BINDIR="/usr/src/WindTurbine/bin"
+CONFIGDIR="/usr/local/etc"
+DBDIR="/usr/local/turbine_DB"
+APP_KEY='pg85fmq2slj3p7j'
+APP_SECRET='ex3whqzzabg6w75'
+DB_TOKEN_FILE="DropBoxToken.txt"
+
+##################### END CONSTANTS ##############
+
+
 
 def command(login_required=True):
     """a decorator for handling authentication and exceptions"""
@@ -35,7 +42,7 @@ def command(login_required=True):
     return decorate
 
 class DropboxTerm(cmd.Cmd):
-    TOKEN_FILE = "token_store.txt"
+    TOKEN_FILE = CONFIGDIR + "/" + DB_TOKEN_FILE
 
     def __init__(self, app_key, app_secret):
         cmd.Cmd.__init__(self)
@@ -223,13 +230,13 @@ def main():
 #   term = DropboxTerm(APP_KEY, APP_SECRET)
     api_client = None
     try:
-        token = open("/usr/src/WindTurbine/utilities/dropbox/token_store.txt").read()
+        token = open(CONFIGDIR+ "/" + DB_TOKEN_FILE).read()
         api_client = client.DropboxClient(token)
         print "[loaded access token]"
     except IOError:
         pass # don't worry if it's not there
 
-    from_file = open(os.path.expanduser("/usr/src/WindTurbine/db/test.db"), "rb")
+    from_file = open(os.path.expanduser(DBDIR+"/test.db"), "rb")
     api_client.put_file("test.db", from_file,True)
 #    term.cmdloop()
 	
