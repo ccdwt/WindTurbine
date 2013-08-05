@@ -1,11 +1,11 @@
 include ../../make.inc
 all: upload
 
-install: dropbox_python upload deps.py
+install: dropbox_python upload deps.py token_store.txt
 	@echo "installing binary"
 	@$(CP) upload $(BIN)
 	@echo "installing token store"
-	@$(CP) token_store.txt $(CONFIG)/$(DB_TOKEN_FILE)
+	@$(CP) token_store.txt $(CONFIGDIR)/$(DB_TOKEN_FILE)
 	@echo "updating cron"
 	@$(SCRIPTS)/cron_update "drop_box upload" "0 * * * * $(BIN)/upload"
 
