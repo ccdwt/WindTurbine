@@ -26,7 +26,7 @@ install_log: log config.xml pwr_rowland pwr_turbine
 	@$(CP) log $(BIN)/rowland_power_log
 	@$(CP) log $(BIN)/turbine_power_log
 	@echo "installing configuration"
-	@$(CP) config.xml $(CONFIGDIR)/config.xml
+	@$(CP) config.xml $(CONFIGDIR)/modbus_power.xml
 	@echo "installing startup scripts"
 	@$(CP) pwr_rowland /etc/init.d/
 	@$(CP) pwr_turbine /etc/init.d/

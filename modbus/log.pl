@@ -11,7 +11,7 @@ use constant MAX_RECV_LEN => 65536;
 
 ##################### reading configuration from xml file #################################
 
-my $file = CONFIGDIR . "/config.xml";             #Configuration file
+my $file = CONFIGDIR . "/modbus_power.xml";             #Configuration file
 my $xs1 = XML::Simple->new();
 my $doc = $xs1->XMLin($file)
 or die "Modbus client : problem with config file: $file\n";;
