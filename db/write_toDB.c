@@ -4,6 +4,7 @@
 #include <sqlite3.h>
 #include <time.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 #ifndef LOGDIR
 #define LOGDIR "/usr/src/WindTurbine/logs"
@@ -23,7 +24,18 @@ void turbine_logfile(long int now);
 void weather_logfile(long int now);
 void power_logfile(long int now, int which); // 0 = turbine, 1 = rowland
 
+void kill_other_instances(char * name){
+	pid_t me = getpid();
+	char command[100];
+	sprintf(command, "pidof \"%s\" -o %d | xargs -r kill ", name, me);
+#ifdef _DEBUG
+	printf("command: %s\n", command);
+#else
+	system(command);
+#endif
 
+
+}
 void append (char * orig, char* piece){
 	int end = strlen(orig);
 	int len = strlen(piece);
@@ -34,6 +46,7 @@ void append (char * orig, char* piece){
 int main(int argc, char ** argv){
 	char cmd[2048];
 	char * db_file = "test.db" ;
+	kill_other_instances(argv[0]);
 	previous_line(NULL, NULL); // initialize values
 	fields[0]=0;
 	values[0]=0;
@@ -66,27 +79,6 @@ int main(int argc, char ** argv){
 
 }
 	
-
-int function (){
-	FILE * fd;
-	char *filename = "test.csv";
-	char buf[1024];
-	char * fields[20];
-	if ((fd = fopen(filename, "rb")) != NULL){
-		int count = 0;
-		for (count = 0; count < 3; count ++){
-
-			char * line = previous_line(fd,buf);
-			//printf("%s\n",line);
-			int i;
-			int argc = csv(line,fields);
-			for(i=0; i < argc; i++){
-				//printf("field %d: %s\n",i,fields[i]);
-			}
-		}
-		fclose(fd);
-	}
-}
 
 
 int DBlog(char * filename, char * cmd){
