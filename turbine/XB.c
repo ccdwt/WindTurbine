@@ -12,7 +12,7 @@ buffer RX_data = {0};
 void parse(char* packet, size_t len){
 	packet_t latest;
 #ifdef DEBUG
-	printf("\x1B[32mPACKET VALID\n");
+	fprintf(stderr,"\x1B[32mPACKET VALID\n");
 #endif
 	latest.len = packet[1]* 256 + packet[2];
 	latest.type = packet[3];
@@ -23,7 +23,7 @@ void parse(char* packet, size_t len){
 			memcpy(latest.addr64,&packet[6],8);
 			memcpy(latest.data,&packet[14],latest.len - 11);
 #ifdef DEBUG
-			printf("ND found %s",latest.data);
+			fprintf(stderr,"ND found %s",latest.data);
 #endif
 			break; 
 		case 0x88:
@@ -60,7 +60,7 @@ void valid_parse(unsigned char* packet, size_t len){
 			for (i = 3; i < len-1; i++){
 				total += packet[i];
 #ifdef DEBUG
-				printf("	checksuming\n");
+				fprintf(stderr,"	checksuming\n");
 #endif
 			}
 			if (0xff - total == packet[len-1]){
@@ -68,7 +68,7 @@ void valid_parse(unsigned char* packet, size_t len){
 				return;
 			}
 #ifdef DEBUG
-			printf("\x1B[31mINVALID CHECKSUM %3.2x%15s\x1B[0m\n"," ",0xff-total);
+			fprintf(stderr,"\x1B[31mINVALID CHECKSUM %3.2x%15s\x1B[0m\n"," ",0xff-total);
 #endif
 			return;
 		} else if (packet_len < len){
@@ -77,12 +77,12 @@ void valid_parse(unsigned char* packet, size_t len){
 			return;
 		}
 #ifdef DEBUG
-		printf("\x1B[31mWRONG LENGTH%15s\x1B[0m\n"," ");
+		fprintf(stderr,"\x1B[31mWRONG LENGTH%15s\x1B[0m\n"," ");
 #endif
 		return;
 	}
 #ifdef DEBUG
-	printf("\x1B[31mWRONG MAGIC NUMBER\x1B[33m\n");
+	fprintf(stderr,"\x1B[31mWRONG MAGIC NUMBER\x1B[33m\n");
 #endif
 	return;
 }
@@ -93,13 +93,13 @@ void listen(unsigned int mSec){
         char INPUT[1024];
         unsigned int input=0;
 #ifdef DEBUG
-	printf("\x1B[33m"); // text will be green
+	fprintf(stderr,"\x1B[33m"); // text will be green
 #endif
         int len = IO_read(BUF,256,mSec*100); // wait to see if there is return
         while (len > 0){
                 if ((BUF[0] == 0x7e) && (input != 0)){ // deal with multiple packets
 #ifdef DEBUG
-			printf ("\x1B[33m> ");printInHex(INPUT,input);printf("\ninput = %d\n", input);
+			fprintf (stderr,"\x1B[33m> ");printInHex(INPUT,input);fprintf(stderr,"\ninput = %d\n", input);
 #endif
 			parse(INPUT,input);
                         input = 0;
@@ -110,8 +110,8 @@ void listen(unsigned int mSec){
         }
         if (input != 0){
 #ifdef DEBUG
-		printf("\x1B[33m> "); printInHex(INPUT, input + len);
-		printf("\n input = %d\n", input);
+		fprintf(stderr,"\x1B[33m> "); printInHex(INPUT, input + len);
+		fprintf(stderr,"\n input = %d\n", input);
 #endif
 		valid_parse(INPUT,input);
         }
@@ -139,7 +139,7 @@ int XB_AT(int cnt, char* cmd, char* data, unsigned char len){
         }
         XB_Checksum(packet);
 #ifdef DEBUG
-	printf("\x1B[36m< "); printInHex(packet,len+8); printf("\n");
+	fprintf(stderr,"\x1B[36m< "); printInHex(packet,len+8); fprintf(stderr,"\n");
 #endif
         IO_write(packet, len + 8);
         listen(5000);
@@ -156,7 +156,7 @@ void XB_TX(int cnt, char*data, size_t len){
         len += 18;
         XB_Checksum(packet);
 #ifdef DEBUG
-	printf ("\x1B[36m< ");printInHex(packet,len);printf("\n");
+	fprintf (stderr,"\x1B[36m< ");printInHex(packet,len);fprintf(stderr,"\n");
 #endif
         IO_write(packet,len);
         listen(5000);

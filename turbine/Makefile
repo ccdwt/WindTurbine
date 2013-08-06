@@ -1,6 +1,7 @@
 UNAME := $(shell uname)
 include ../make.inc
 
+CCFLAGS := $(CCFLAGS) -D DEBUG
 ifeq ($(UNAME), CYGWIN_NT-5.1)
 	USBLIB = -llibusb-1.0
 	EXT = .exe
@@ -10,7 +11,7 @@ endif
 
 all: turbine logger asoc at
 
-install: install_log install_test install_startup
+install: install_log install_test 
 
 log: logger
 
@@ -60,7 +61,7 @@ init.sh: init.m4
 ################ INSTALL #######################
 
 
-install_log: log
+install_log: log install_startup
 	@echo "Installing binary"
 	@$(CP) logger $(BIN)/turbine_log
 
@@ -73,4 +74,4 @@ install_startup: init.sh
 
 ################## CLEAN ########################
 clean: 
-	rm -f *~ *.o turbine$(EXT) usb_turbine$(EXT) logger$(EXT)
+	rm -f *~ *.o turbine$(EXT) logger$(EXT) init.sh at$(EXT) asoc$(EXT)

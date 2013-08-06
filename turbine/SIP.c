@@ -5,7 +5,9 @@
 SIP_Raw  Turbine_Raw;
 SIP_Engr Turbine_Status;
 
+#ifndef DEBUG
 #define DEBUG
+#endif
 #define bit(x)  (1 << (x))
 
 /*****
@@ -82,7 +84,7 @@ bool SIP_Parse(unsigned char * mem, unsigned int len){
 	unsigned int crc;
 	if (mem != NULL && len > 80){ 
 #ifdef DEBUG
-		printf("SIP: doing CRC calculation\n");
+		fprintf(stderr,"SIP: doing CRC calculation\n");
 #endif
 		crc = calc_crc16(&mem[2],len - 6);
 	} else {
@@ -98,11 +100,11 @@ bool SIP_Parse(unsigned char * mem, unsigned int len){
 		&& mem[len-1] == 0x03	//ETX
 	   ){
 #ifdef DEBUG
-		printf("memcpy .. "); fflush(stdout);
+		fprintf(stderr,"memcpy .. "); fflush(stderr);
 #endif
 		memcpy(&Turbine_Raw,&mem[11], sizeof(SIP_Raw)>len?len:sizeof(SIP_Raw));
 #ifdef DEBUG
-		printf("done!\n");
+		fprintf(stderr,"done!\n");
 #endif
 		Turbine_Status.SoftwareRev   = 	Turbine_Raw.SoftwareRev;		
 		Turbine_Status.OPVersion     = 	Turbine_Raw.OPVersion;		
@@ -142,12 +144,12 @@ bool SIP_Parse(unsigned char * mem, unsigned int len){
 		Turbine_Status.Access	= 	Turbine_Raw.Access;				
 		Turbine_Status.Timer 	= 	Turbine_Raw.Timer;
 #ifdef DEBUG
-		printf ("Valid SIP", len);
+		fprintf (stderr,"Valid SIP", len);
 #endif
 		return true;
 	}else {
 #ifdef DEBUG
-		printf("Invalid SIP: crc=%3.2x%3.2x, %3.2x%3.2x | len = %d\n",crc%256,crc>>8,mem[len-4], mem[len-3], len);
+		fprintf(stderr,"Invalid SIP: crc=%3.2x%3.2x, %3.2x%3.2x | len = %d\n",crc%256,crc>>8,mem[len-4], mem[len-3], len);
 #endif
 		return false;
 	}	

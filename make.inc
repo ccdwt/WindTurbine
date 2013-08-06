@@ -1,7 +1,7 @@
 PWD := $(shell pwd| sed -e 's!/\(db\|modbus\|turbine\|weather\|utilities/dropbox\|utilities/monit\)!!')
 
 CCFLAGS := -g -std=gnu99
-BIN := $(PWD)/bin
+BIN := /usr/local/bin
 CONFIGDIR := /usr/local/etc
 LOGDIR := /usr/local/logs
 PIDDIR := /var/run

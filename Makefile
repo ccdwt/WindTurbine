@@ -12,12 +12,12 @@ clean: weather/clean turbine/clean modbus/clean BeagleBone/clean db/clean monit/
 #uninstall: weather/uninstall turbine/uninstall modbus/uninstall BeagleBone/uninstall db/uninstall monit/uninstall dropBox/uninstall
 
 ######### install  #####################
-install: install_BBB install_noarch
+install: install_dirs install_BBB install_noarch
 
 install_BBB: warning
 	+$(MAKE) install -C BeagleBone
 
-install_noarch: install_loggers install_db install_backup
+install_noarch: install_loggers install_db install_backup install_monit
 
 install_loggers: loggers install_modbus install_weather install_turbine
 
@@ -42,6 +42,18 @@ install_weather:
 
 install_turbine:
 	@$(MAKE) install_log -C turbine
+
+install_monit:
+	@$(MAKE) install -C utilities/monit
+
+install_dirs:
+	@echo "creating install directories if they do not exist"
+	@if [ ! -d "$(CONFIGDIR)" ]; then mkdir $(CONFIGDIR); fi
+	@if [ ! -d "$(PIDDIR)" ]; then mkdir $(PIDDIR); fi
+	@if [ ! -d "$(LOGDIR)" ]; then mkdir $(LOGDIR); fi
+	@if [ ! -d "$(DBDIR)" ]; then mkdir $(DBDIR); fi
+	@if [ ! -d "$(BIN)" ]; then mkdir $(BIN); fi
+
 
 warning: scripts/warn.sh
 	scripts/warn.sh
