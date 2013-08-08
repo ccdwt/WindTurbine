@@ -12,7 +12,10 @@ clean: weather/clean turbine/clean modbus/clean BeagleBone/clean db/clean monit/
 #uninstall: weather/uninstall turbine/uninstall modbus/uninstall BeagleBone/uninstall db/uninstall monit/uninstall dropBox/uninstall
 
 ######### install  #####################
-install: install_dirs install_BBB install_noarch
+install: install_dirs install_BBB install_noarch install_complete
+
+install_complete:
+	@echo "Installation complete run /etc/init.d/monit start or reboot"
 
 install_BBB: warning
 	+$(MAKE) install -C BeagleBone
@@ -48,6 +51,7 @@ install_monit:
 
 install_dirs:
 	@echo "creating install directories if they do not exist"
+	@if [ ! -d "$(INSTALL_BASE)" ]; then mkdir $(INSTALL_BASE); fi
 	@if [ ! -d "$(CONFIGDIR)" ]; then mkdir $(CONFIGDIR); fi
 	@if [ ! -d "$(PIDDIR)" ]; then mkdir $(PIDDIR); fi
 	@if [ ! -d "$(LOGDIR)" ]; then mkdir $(LOGDIR); fi
@@ -57,7 +61,7 @@ install_dirs:
 
 warning: scripts/warn.sh
 	scripts/warn.sh
-	
+
 loggers: weather/log turbine/logger modbus/log
 
 tests: weather/test turbine/turbine modbus/test

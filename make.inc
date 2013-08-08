@@ -1,5 +1,6 @@
 PWD := $(shell pwd| sed -e 's!/\(db\|modbus\|turbine\|weather\|utilities/dropbox\|utilities/monit\)!!')
 
+INSTALL_BASE := /usr/local
 CCFLAGS := -g -std=gnu99
 BIN := /usr/local/bin
 CONFIGDIR := /usr/local/etc

@@ -29,17 +29,23 @@ install_log: log config.xml pwr_rowland pwr_turbine
 	@$(CP) config.xml $(CONFIGDIR)/modbus_power.xml
 	@echo "installing startup scripts"
 	@$(CP) pwr_rowland /etc/init.d/
+	chmod +x /etc/init.d/pwr_rowland
 	@$(CP) pwr_turbine /etc/init.d/
+	chmod +x /etc/init.d/pwr_turbine
 
-deps: 
+deps.pl:
+	@echo generating dependency file for perl
+	cat log.pl |grep ^use > deps.pl
+deps: deps.pl
 	@ echo -n "checking dependencies for modbus .. "
-	@ if perl -e "$(grep ^use log.pl)"; then echo "Present"; else \
+	@ if perl -c deps.pl; then echo "Present"; else \
 		echo "Not present";\
 		echo "installing XML::Parser";\
 		echo "installing IO::Socket";\
 		opkg install libxml-parser-perl perl-module-io-socket;\
 		echo "installing Proc::Daemon";\
 		perl -MCPAN -e "install Proc::Daemon";\
+		perl -MCPAN -e "install XML::Simple";\
 		fi
 
 clean:

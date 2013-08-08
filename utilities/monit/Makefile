@@ -2,12 +2,25 @@ include ../../make.inc
 
 all: make
 
-install: make monitrc
+install: make monitrc startup
 	$(MAKE) install -C monit-5.5.1
 	$(CP) monitrc /etc/monitrc
+	chmod 700 /etc/monitrc
+
+startup:
+	@echo "coppying startup file"
+	@$(CP) startup.sh /etc/init.d/monit
+	@chmod +x /etc/init.d/monit
+	@echo "adding to runlevels 3,4,5"
+	@$(SYM) /etc/init.d/monit /etc/rc3.d/S99monit
+	@$(SYM) /etc/init.d/monit /etc/rc4.d/S99monit
+	@$(SYM) /etc/init.d/monit /etc/rc5.d/S99monit
+
 
 monitrc: rc.m4
 	m4 -D LOGDIR=$(LOGDIR) -D PIDDIR=$(PIDDIR) -D DBDIR=$(DBDIR) rc.m4 > monitrc
+	chmod 700 monitrc
+
 make: patch
 	$(MAKE) all -C monit-5.5.1
 

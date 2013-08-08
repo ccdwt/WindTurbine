@@ -6,7 +6,7 @@ write: write_toDB.c sqlite3
 	gcc $(CCFLAGS) $(LOG_DEF) $(DB_DEF) -o write write_toDB.c $(shell pkg-config --libs sqlite3)
 
 debug: write_toDB.c sqlite3
-	gcc $(CCFLAGS) $(LOG_DEF) $(DB_DEF) -o debug write_toDB.c $(shell pkg-config --libs sqlite3) -D _DEBUG
+	gcc $(CCFLAGS) $(LOG_DEF) $(DB_DEF) -o debug write_toDB.c $(shell pkg-config --libs sqlite3) -D DEBUG
 
 install_cron:
 	@echo "Installing cron entries for write_db"
@@ -15,6 +15,8 @@ install_cron:
 install_db: write
 	@echo "Installing write_db"
 	@$(CP) write $(BIN)/db_write
+	@echo "installing Database File"
+	@$(CP) test.db $(DBDIR)
 sqlite3:
 	@echo -n "checking for sqlite3 .. "
 	@if pkg-config --exists sqlite3; then echo "Found!"; else \

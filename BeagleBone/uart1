@@ -2,7 +2,9 @@
 set -e
 
 sleep 5 # wait for everyting to get in the right places
-echo uart2pinmux > /sys/devices/bone_capemgr.9/slots
+DIR=$(ls /sys/devices |grep bone_capemgr);
+echo /sys/devices/$DIR/slots
+echo BB-UART1 > /sys/devices/$DIR/slots
 
 exit 0
 

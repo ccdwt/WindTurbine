@@ -28,7 +28,7 @@ void kill_other_instances(char * name){
 	pid_t me = getpid();
 	char command[100];
 	sprintf(command, "pidof \"%s\" -o %d | xargs -r kill ", name, me);
-#ifdef _DEBUG
+#ifdef DEBUG
 	printf("command: %s\n", command);
 #else
 	system(command);
@@ -71,7 +71,7 @@ int main(int argc, char ** argv){
 		values[0] = ' ';
 	}
 	sprintf(cmd,"INSERT INTO Table1 (%s) VALUES (%s);",fields,values);
-#ifdef _DEBUG
+#ifdef DEBUG
 	printf ("%s\n",cmd);
 #else
  	DBlog(db_file, cmd);
@@ -131,17 +131,24 @@ char * previous_line(FILE * fd, char* line){
 		state.length = 100; // 260
 		fseek(state.fd,0,SEEK_END);
 	}
-// 	printf("ftell before seek = %ld\n",ftell(state.fd));
+
+#ifdef DEBUG
+ 	printf("ftell before seek = %ld\n",ftell(state.fd));
+#endif
 
 	if (fseek(state.fd, -1 * (state.length), SEEK_CUR) == -1){
 		state.length = ftell(state.fd);
 		fseek(state.fd,0,SEEK_SET);
 		BOF=true;
+	} else if (ftell(state.fd) == 0){
+		BOF = true;
 	} else {
 		BOF = false;
 	}
-	while (last_newline == NULL){
+	while (last_newline == NULL && BOF == false){
+#ifdef DEBUG
 // 		printf("ftell = %ld\n", ftell(state.fd));
+#endif
 		len = fread(line,1,state.length,fd);
 		fseek(state.fd, -1 * len, SEEK_CUR); // go back to where we were.
 // 		printf ("got %u bytes\n",len);
@@ -165,7 +172,7 @@ char * previous_line(FILE * fd, char* line){
 	fseek(state.fd, len-state.length, SEEK_CUR); // there are characters we didn't keep
 // 	printf("length was %d\n",state.length);
 
-	return last_newline+1;
+	return (last_newline == NULL) ? NULL : last_newline+1;
 
 }
 
@@ -187,35 +194,43 @@ void turbine_logfile(long int now){
 	char buf[1024];
 	char * argv[78];
 	FILE * fd;
-#ifdef _DEBUG
+#ifdef DEBUG
 	printf (LOGDIR"/turbine_log.csv\n");
 #endif
 	if ((fd = fopen(LOGDIR"/turbine_log.csv", "rb")) != NULL){
 		int count = 0;
 		while(1){
 			char * line = previous_line(fd,buf);
-// 			printf ("line: %s\n", line);
-// 			printf ("got last line\n");
-			int argc = csv(line,argv);
-// 			printf ("got %d values from csv\n", argc);
-			timestamp = atoi(argv[0]);
-// 			printf ("%s, %s, %s\n", argv[0],argv[12],argv[18]);
-// 			printf ("ts = %d, now = %d\n", timestamp, now);
+#ifdef DEBUG
+ 			printf ("line: %s\n", line);
+ 			printf ("got last line\n");
+#endif
+			if (line != NULL || ! BOF){
+				int argc = csv(line,argv);
+#ifdef DEBUG
+ 				printf ("got %d values from csv\n", argc);
+#endif
+				timestamp = atoi(argv[0]);
+#ifdef DEBUG
+ 				printf ("%s, %s, %s\n", argv[0],argv[12],argv[18]);
+	 			printf ("ts = %d, now = %d\n", timestamp, now);
+#endif
+			}
 			if ( (now - timestamp ) >= 60 || BOF){
 				if (count == 0) return;
 				break;
 			}
 			RPM += (unsigned) atoi(argv[18]);
 			PowerOutKw +=(float) atol(argv[12]) / 1000; // <- W to kW
-#ifdef _DEBUG
+#ifdef DEBUG
 			printf ("got t=%u,rpm = %u, pout = %d\n", atol(argv[0]), atol(argv[18]), atol(argv[12]));
 #endif
 			count ++;
-		} 
+		}	
 		RPM /= count;
 		PowerOutKw /= count;
 		append(fields, ",RPM,PowerOutKw");
-	       	sprintf(buf, ",%u,%.3f",RPM, PowerOutKw);
+		sprintf(buf, ",%u,%.3f",RPM, PowerOutKw);
 		append(values, buf);
 
 	}
@@ -239,12 +254,14 @@ void power_logfile(long int now, int which){ // 0 = turbine, 1 = rowland
 		int count=0;
 		while(1){
 			char * line = previous_line(fd,buf);
-			int argc = csv(line, argv);
-//			printf("got %d values on line\n",argc);
-#ifdef _DEBUG
-			printf("%s, %s, %s, %s, %s, %s\n",argv[0], argv[8],argv[13],argv[14],argv[15],argv[16]);
+			if ( line != NULL || ! BOF){
+				int argc = csv(line, argv);
+	//			printf("got %d values on line\n",argc);
+#ifdef DEBUG
+				printf("%s, %s, %s, %s, %s, %s\n",argv[0], argv[8],argv[13],argv[14],argv[15],argv[16]);
 #endif
-			timestamp = atoi(argv[0]);
+				timestamp = atoi(argv[0]);
+			}
 			if ((now - timestamp) >= 60 ||BOF){
 				if (count == 0) return;
 				break;
@@ -293,8 +310,10 @@ void weather_logfile(long int now){
 		int count = 0;
 		while (1){
 			char * line = previous_line(fd, buf);
-			int argc = csv(line, argv);
-			timestamp = atoi(argv[0]);
+			if (line != NULL || !BOF){
+				int argc = csv(line, argv);
+				timestamp = atoi(argv[0]);
+			}
 			if ((now - timestamp) >= 60||BOF){
 				if (count == 0) return;
 				break;
@@ -311,7 +330,7 @@ void weather_logfile(long int now){
 			dayRain		+= atof(argv[20]);
 			dayET		+= atof(argv[26]);
 			count ++;
-#ifdef _DEBUG
+#ifdef DEBUG
  			printf ("solarRadiation = %d, %d \n",atoi(argv[18]));
 #endif
 		}
@@ -326,7 +345,7 @@ void weather_logfile(long int now){
         solarRadiation	/= count;
         dayRain		/= count;
         dayET		/= count;
-#ifdef _DEBUG
+#ifdef DEBUG
 	printf ("count = %d, solarradiation = %d\n", count, solarRadiation);
 #endif
 	append(fields, ",Barometer,OutSideTemp,WindSpeed,tenMinAgvWind,WindDir,OutsideHumidity,RainRate,SolarRad,DayRain,DayET,UVIndex");

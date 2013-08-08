@@ -15,7 +15,8 @@ install_log: weather
 	@echo "Installing binary"
 	@$(CP) log $(BIN)/weather_log
 	@echo "Installing startup script"
-	@$(CP) weather /etc/init.d/weather	
+	@$(CP) weather /etc/init.d/weather
+	@chmod +x /etc/init.d/weather	
 
 clean: 
 	rm -rf test test.exe log log.exe weather *.o *~ *.csv 

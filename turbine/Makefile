@@ -71,6 +71,7 @@ install_test: test
 install_startup: init.sh
 	@echo installing startup script
 	@$(CP) init.sh /etc/init.d/turbine
+	@chmod +x /etc/init.d/turbine
 
 ################## CLEAN ########################
 clean: 
