@@ -8,7 +8,7 @@ test: test.pl config.xml deps
 	@echo "checking sytax of test.pl"
 	@perl -c test.pl; ../scripts/fixLocale.sh test.pl
 
-log: log.pl config.xml
+log: log.pl config.xml deps
 	@echo "adding configuration to log"
 	@$(SCRIPTS)/perl_constants.sh log.pl log "CONFIGDIR=>\"$(CONFIGDIR)\"" "LOGDIR=>\"$(LOGDIR)\"" "PIDDIR=>\"$(PIDDIR)\""
 	@chmod +x log
