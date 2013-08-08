@@ -6,3 +6,5 @@ import shlex
 import sys
 from dropbox import client, rest
 from setuptools import setup
+import distutils
+import compile_py

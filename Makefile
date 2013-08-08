@@ -15,7 +15,11 @@ clean: weather/clean turbine/clean modbus/clean BeagleBone/clean db/clean monit/
 install: install_dirs install_BBB install_noarch install_complete
 
 install_complete:
+	@echo 
+	@echo "################### COMPLETE #################################"
 	@echo "Installation complete run /etc/init.d/monit start or reboot"
+	@echo 
+	@echo
 
 install_BBB: warning
 	+$(MAKE) install -C BeagleBone

@@ -13,7 +13,8 @@ log: log.pl config.xml deps
 	@$(SCRIPTS)/perl_constants.sh log.pl log "CONFIGDIR=>\"$(CONFIGDIR)\"" "LOGDIR=>\"$(LOGDIR)\"" "PIDDIR=>\"$(PIDDIR)\""
 	@chmod +x log
 	@echo "checking syntax of log"
-	@perl -c log; ../scripts/fixLocale.sh log
+	@perl -c log
+	@$(SCRIPTS)/fixLocale.sh log
 
 pwr_rowland: pwr.m4
 	@m4 $(BIN_DEF) $(LOG_DEF) $(PID_DEF) -D NAME=rowland pwr.m4 > pwr_rowland

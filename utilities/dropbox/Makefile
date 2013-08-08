@@ -33,7 +33,6 @@ https-curl: curl
 	@echo -n "Testing for https support in curl .. "
 	@if curl "https://www.google.com" &> /dev/null; then echo "Found!"; else\
 		echo "not found. Installing https support"; \
-#		opkg install ca-certificates;\ # no longer needed
 		echo "export CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" >> ~/.profile;\
 		fi
 
