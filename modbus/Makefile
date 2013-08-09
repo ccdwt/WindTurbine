@@ -41,12 +41,10 @@ deps: deps.pl
 	@ echo -n "checking dependencies for modbus .. "
 	@ if perl -c deps.pl; then echo "Present"; else \
 		echo "Not present";\
-		echo "installing XML::Parser";\
-		echo "installing IO::Socket";\
-		opkg install libxml-parser-perl perl-module-io-socket;\
+		echo "installing "XML::Simple";\
+		perl -MCPAN -e "install XML::Simple";\
 		echo "installing Proc::Daemon";\
 		perl -MCPAN -e "install Proc::Daemon";\
-		perl -MCPAN -e "install XML::Simple";\
 		fi
 
 clean:
