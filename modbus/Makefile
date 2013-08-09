@@ -43,7 +43,7 @@ deps: deps.pl
 		echo "Not present";\
 		echo "Configuring CPAN";\
 		perl -MCPAN -e "install CPAN";\
-		echo "installing "XML::Simple";\
+		echo "installing XML::Simple";\
 		perl -MCPAN -e "install XML::Simple";\
 		echo "installing Proc::Daemon";\
 		perl -MCPAN -e "install Proc::Daemon";\
