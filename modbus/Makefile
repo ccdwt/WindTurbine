@@ -41,6 +41,8 @@ deps: deps.pl
 	@ echo -n "checking dependencies for modbus .. "
 	@ if perl -c deps.pl; then echo "Present"; else \
 		echo "Not present";\
+		echo "Configuring CPAN";\
+		perl -MCPAN -e "install CPAN";\
 		echo "installing "XML::Simple";\
 		perl -MCPAN -e "install XML::Simple";\
 		echo "installing Proc::Daemon";\
