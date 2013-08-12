@@ -119,6 +119,7 @@ set alert prm5@students.calvin.edu only on {timeout}                      # rece
 set httpd port 2812 and
     use address 0.0.0.0	  # only accept connection from localhost
     allow 153.106.0.0/16   # allow localhost to connect to the server and
+    allow 192.168.7.1
     allow admin:monit      # require user 'admin' with password 'monit'
     allow @monit           # allow users of group 'monit' to connect (rw)
     allow @users readonly  # allow users of group 'users' to connect readonly
