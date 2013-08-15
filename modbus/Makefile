@@ -34,20 +34,25 @@ install_log: log config.xml pwr_rowland pwr_turbine
 	@$(CP) pwr_turbine /etc/init.d/
 	chmod +x /etc/init.d/pwr_turbine
 
-deps.pl:
+deps.pl: cpan
 	@echo generating dependency file for perl
 	cat log.pl |grep ^use > deps.pl
 deps: deps.pl
 	@ echo -n "checking dependencies for modbus .. "
 	@ if perl -c deps.pl; then echo "Present"; else \
 		echo "Not present";\
-		echo "Configuring CPAN";\
-		perl -MCPAN -e "install CPAN";\
+		echo "configuring CPAN";\
+		echo "q" |perl -MCPAN -e "shell";\
 		echo "installing XML::Simple";\
 		perl -MCPAN -e "install XML::Simple";\
 		echo "installing Proc::Daemon";\
 		perl -MCPAN -e "install Proc::Daemon";\
 		fi
+
+cpan:
+	@echo generating cpan configuration
+	@mkdir -p ~/.cpan/CPAN
+	@$(CP) MyConfig.pm ~/.cpan/CPAN/MyConfig.pm
 
 clean:
 	rm -f *.swp *~ *.log *.csv log test pwr_rowland pwr_turbine
