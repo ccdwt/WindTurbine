@@ -226,10 +226,10 @@ def main():
         pass # don't worry if it's not there
 
    
-        to_file = open(os.path.expanduser(DBDIR + "/" + DB_NAME), "wb")
+    to_file = open(os.path.expanduser(DBDIR + "/" + DB_NAME), "wb")
 
-        f, metadata = self.api_client.get_file_and_metadata(self.current_path + "/" + DB_NAME)
-        to_file.write(f.read())
+    f, metadata = api_client.get_file_and_metadata("/" + DB_NAME)
+    to_file.write(f.read())
 	
 
 if __name__ == '__main__':

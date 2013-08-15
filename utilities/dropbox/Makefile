@@ -3,11 +3,15 @@ all: upload
 
 install: dropbox_python upload deps.py token_store.txt
 	@echo "installing binary"
-	@$(CP) upload $(BIN)
+	@$(CP) upload $(BIN)/db_upload
+	@$(CP) download $(BIN)/db_download
 	@echo "installing token store"
 	@$(CP) token_store.txt $(CONFIGDIR)/$(DB_TOKEN_FILE)
 	@echo "updating cron"
-	@$(SCRIPTS)/cron_update "drop_box upload" "0 * * * * $(BIN)/upload"
+	@$(SCRIPTS)/cron_update "drop_box upload" "0 * * * * $(BIN)/db_upload"
+	@echo "pulling remote database file"
+	@$(BIN)/db_download
+
 
 upload: upload.py
 	@echo "Adding configuration variables to upload"
