@@ -15,8 +15,8 @@ install_cron:
 install_db: write
 	@echo "Installing write_db"
 	@$(CP) write $(BIN)/db_write
-	@echo "installing Database File"
-	@$(CP) test.db $(DBDIR)
+	#@echo "installing Database File"
+	#@$(CP) test.db $(DBDIR)
 sqlite3:
 	@echo -n "checking for sqlite3 .. "
 	@if pkg-config --exists sqlite3; then echo "Found!"; else \

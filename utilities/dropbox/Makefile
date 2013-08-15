@@ -11,19 +11,24 @@ install: dropbox_python upload deps.py token_store.txt
 
 upload: upload.py
 	@echo "Adding configuration variables to upload"
-	@$(SCRIPTS)/python_vars.sh upload.py upload "BINDIR=\"$(BIN)\"" "CONFIGDIR=\"$(CONFIGDIR)\"" "DBDIR=\"$(DBDIR)\"" "APP_KEY=$(DB_APP_KEY)" "APP_SECRET=$(DB_APP_SECRET)" "DB_TOKEN_FILE=\"$(DB_TOKEN_FILE)\"";\
+	@$(SCRIPTS)/python_vars.sh upload.py upload "BINDIR=\"$(BIN)\"" "CONFIGDIR=\"$(CONFIGDIR)\"" "DBDIR=\"$(DBDIR)\"" "DB_NAME=\"$(DB_NAME)\"" "APP_KEY=$(DB_APP_KEY)" "APP_SECRET=$(DB_APP_SECRET)" "DB_TOKEN_FILE=\"$(DB_TOKEN_FILE)\"";\
 	chmod +x upload
+
+download: download.py
+	@echo "Adding configuration variables to download"
+	@$(SCRIPTS)/python_vars.sh download.py download "BINDIR=\"$(BIN)\"" "CONFIGDIR=\"$(CONFIGDIR)\"" "DBDIR=\"$(DBDIR)\"" "DB_NAME=\"$(DB_NAME)\"" "APP_KEY=$(DB_APP_KEY)" "APP_SECRET=$(DB_APP_SECRET)" "DB_TOKEN_FILE=\"$(DB_TOKEN_FILE)\"";\
+	chmod +x download
 
 dropbox_python: setup-tools
 	@echo -n "Testing for DropBox api .. "
 	@if python deps.py &> /dev/null; then echo "Found!";\
 	       	else echo "not found. Installing DropBox API";\
-	        cd dropbox-python-sdk-1.6 python setup.py install;\
+	        cd dropbox-python-sdk-1.6; python setup.py install;\
 		fi
 
 setup-tools: https-curl python deps.py
 	@echo -n "Testing for Python setuptools .. "
-	@if python deps.py &> /dev/null; then echo "Found!";\
+	@if python setuptools-check.py &> /dev/null; then echo "Found!";\
 		else echo "not found. Installing python setuptools.";\
 		opkg install python-distutils python-compile python-compiler;\
 		curl -k https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O;\
