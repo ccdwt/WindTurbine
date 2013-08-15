@@ -27,7 +27,8 @@ dropbox_python: setup-tools
 	@echo -n "Testing for DropBox api .. "
 	@if python deps.py &> /dev/null; then echo "Found!";\
 	       	else echo "not found. Installing DropBox API";\
-	        cd dropbox-python-sdk-1.6; python setup.py install;\
+	        cd dropbox-python-sdk-1.6;\
+	       	python setup.py install;\
 		fi
 
 setup-tools: https-curl python deps.py
@@ -50,7 +51,6 @@ deps.py: upload.py
 	@grep import upload.py > deps.py
 	@echo "from setuptools import setup" >> deps.py
 	@echo "import distutils" >> deps.py
-	@echo "import compile_py" >> deps.py
 curl: 
 	@echo -n "Testing for curl .. "
 	@if which curl; then true ; else opkg install curl ;  fi
