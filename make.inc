@@ -7,6 +7,7 @@ CONFIGDIR := /usr/local/etc
 LOGDIR := /usr/local/logs
 PIDDIR := /var/run
 DBDIR := /usr/local/turbine_DB
+DB_NAME := test.db
 WEATHER_INTERVAL := 20
 WEATHER_HOST := weather
 TURBINE_INTERVAL:= 20

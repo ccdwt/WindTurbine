@@ -1,7 +1,7 @@
 include ../../make.inc
 all: upload
 
-install: dropbox_python upload deps.py token_store.txt
+install: download dropbox_python upload deps.py token_store.txt
 	@echo "installing binary"
 	@$(CP) upload $(BIN)/db_upload
 	@$(CP) download $(BIN)/db_download
