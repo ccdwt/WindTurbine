@@ -35,9 +35,9 @@ setup-tools: https-curl python deps.py
 	@echo -n "Testing for Python setuptools .. "
 	@if python setuptools-check.py &> /dev/null; then echo "Found!";\
 		else echo "not found. Installing python setuptools.";\
+		opkg install python-compile python-compiler python-distutils;\
 		curl -k https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O;\
 		. ~/.profile; python ez_setup.py; fi
-
 https-curl: curl
 	@echo -n "Testing for https support in curl .. "
 	@if curl "https://www.google.com" &> /dev/null; then echo "Found!"; else\
@@ -48,7 +48,6 @@ https-curl: curl
 deps.py: upload.py
 	@echo "generating deps.py"
 	@grep import upload.py > deps.py
-	@echo "from setuptools import setup" >> deps.py
 	@echo "import distutils" >> deps.py
 curl: 
 	@echo -n "Testing for curl .. "
