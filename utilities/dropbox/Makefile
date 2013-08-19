@@ -37,7 +37,7 @@ setup-tools: https-curl python deps.py
 		else echo "not found. Installing python setuptools.";\
 		opkg install python-distutils python-compile python-compiler;\
 		curl -k https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O;\
-		python ez_setup.py; fi
+		. ~/.profile; python ez_setup.py; fi
 
 https-curl: curl
 	@echo -n "Testing for https support in curl .. "
