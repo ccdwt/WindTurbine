@@ -269,7 +269,7 @@ void power_logfile(long int now, int which){ // 0 = turbine, 1 = rowland
 				int argc = csv(line, argv);
 	//			printf("got %d values on line\n",argc);
 #ifdef DEBUG
-				printf("%s, %s, %s, %s, %s, %s\n",argv[0], argv[8],argv[13],argv[14],argv[15],argv[16]);
+				printf("%s, %s, %s, %s, %s, %s\n",argv[6], argv[7],argv[8],argv[14],argv[15],argv[16]);
 #endif
 				timestamp = atoi(argv[0]);
 			}
@@ -292,14 +292,16 @@ void power_logfile(long int now, int which){ // 0 = turbine, 1 = rowland
 
 		if (which){ // rowland
 			append(fields, ",RowlandkWTotalReal, RowlandkWhImport, RowlandkWhExport, RowlandkWhTotal, RowlandkWhNet");
-			json_object_object_add(json, "RowlandExport",json_object_new_int( kWhExport));
-			json_object_object_add(json, "RowlandImport",json_object_new_int( kWhImport));
-			json_object_object_add(json, "RowlandNet",json_object_new_int( kWhNet));
+			json_object_object_add(json, "RowlandHistExport",json_object_new_int( kWhExport));
+			json_object_object_add(json, "RowlandHistImport",json_object_new_int( kWhImport));
+			json_object_object_add(json, "RowlandHistNet",json_object_new_int( kWhNet));
+			json_object_object_add(json, "RowlandExport", json_object_new_double(kWTotalReal));
 		} else { // turbine
 			append(fields, ",PwrMeterkWTotalReal, PwrMeterkWhImport, PwrMeterkWhExport, PwrMeterkWhTotal, PwrMeterkWhNet");
-			json_object_object_add(json, "TurbineExport",json_object_new_int( kWhExport));
-			json_object_object_add(json, "TurbineImport",json_object_new_int( kWhImport));
-			json_object_object_add(json, "TurbineNet",json_object_new_int( kWhNet));
+			json_object_object_add(json, "TurbinHistExport",json_object_new_int( kWhExport));
+			json_object_object_add(json, "TurbineHistImport",json_object_new_int( kWhImport));
+			json_object_object_add(json, "TurbineHistNet",json_object_new_int( kWhNet));
+			json_object_object_add(json, "TurbineExport", json_object_new_double(kWTotalReal));
 		}
 		sprintf(buf, ",%.2f,%d,%d,%d,%d",kWTotalReal, kWhImport, kWhExport, kWhTotal, kWhNet);
 		append(values,buf);
