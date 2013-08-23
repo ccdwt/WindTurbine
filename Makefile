@@ -60,6 +60,7 @@ install_dirs:
 	@if [ ! -d "$(PIDDIR)" ]; then mkdir $(PIDDIR); fi
 	@if [ ! -d "$(LOGDIR)" ]; then mkdir $(LOGDIR); fi
 	@if [ ! -d "$(DBDIR)" ]; then mkdir $(DBDIR); fi
+	@if [ ! -d "$(HTML_DIR)" ]; then mkdir $(HTML_DIR); fi
 	@if [ ! -d "$(BIN)" ]; then mkdir $(BIN); fi
 
 

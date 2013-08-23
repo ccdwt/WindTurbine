@@ -5,6 +5,7 @@
 #include <time.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <json.h>
 
 #ifndef LOGDIR
 #define LOGDIR "/usr/src/WindTurbine/logs"
@@ -14,6 +15,7 @@
 
 char fields [ 1024 ];
 char values [ 2048 ];
+json_object * json;
 bool BOF; // beginning of file 
 
 int csv(char* input, char ** argv);
@@ -46,6 +48,7 @@ void append (char * orig, char* piece){
 int main(int argc, char ** argv){
 	char cmd[2048];
 	char * db_file = DBDIR"/test.db" ;
+	json = json_object_new_object();
 	kill_other_instances(argv[0]);
 	previous_line(NULL, NULL); // initialize values
 	fields[0]=0;
@@ -71,9 +74,15 @@ int main(int argc, char ** argv){
 		values[0] = ' ';
 	}
 	sprintf(cmd,"INSERT INTO Table1 (%s) VALUES (%s);",fields,values);
+
 #ifdef DEBUG
 	printf ("%s\n",cmd);
+	printf("%s\n", json_object_to_json_string(json));
+	
 #else
+	FILE * json_file = fopen(JSON_FILE,"w");
+	fprintf(json_file, "%s",json_object_to_json_string(json));
+	fclose(json_file);
  	DBlog(db_file, cmd);
 #endif
 
@@ -229,6 +238,8 @@ void turbine_logfile(long int now){
 		}	
 		RPM /= count;
 		PowerOutKw /= count;
+		json_object_object_add(json, "TurbineRPM",json_object_new_int( RPM));
+		json_object_object_add(json, "TurbinePowerOut",json_object_new_double( PowerOutKw));
 		append(fields, ",RPM,PowerOutKw");
 		sprintf(buf, ",%u,%.3f",RPM, PowerOutKw);
 		append(values, buf);
@@ -278,10 +289,17 @@ void power_logfile(long int now, int which){ // 0 = turbine, 1 = rowland
 		kWhExport /= count;
 		kWhTotal /= count;
 		kWhNet /=count;
+
 		if (which){ // rowland
 			append(fields, ",RowlandkWTotalReal, RowlandkWhImport, RowlandkWhExport, RowlandkWhTotal, RowlandkWhNet");
+			json_object_object_add(json, "RowlandExport",json_object_new_int( kWhExport));
+			json_object_object_add(json, "RowlandImport",json_object_new_int( kWhImport));
+			json_object_object_add(json, "RowlandNet",json_object_new_int( kWhNet));
 		} else { // turbine
 			append(fields, ",PwrMeterkWTotalReal, PwrMeterkWhImport, PwrMeterkWhExport, PwrMeterkWhTotal, PwrMeterkWhNet");
+			json_object_object_add(json, "TurbineExport",json_object_new_int( kWhExport));
+			json_object_object_add(json, "TurbineImport",json_object_new_int( kWhImport));
+			json_object_object_add(json, "TurbineNet",json_object_new_int( kWhNet));
 		}
 		sprintf(buf, ",%.2f,%d,%d,%d,%d",kWTotalReal, kWhImport, kWhExport, kWhTotal, kWhNet);
 		append(values,buf);
@@ -348,6 +366,16 @@ void weather_logfile(long int now){
 #ifdef DEBUG
 	printf ("count = %d, solarradiation = %d\n", count, solarRadiation);
 #endif
+	json_object_object_add(json, "barometer",(json_object *) json_object_new_double( barometer));
+	json_object_object_add(json, "temp",(json_object*) json_object_new_double( outtemp));
+	json_object_object_add(json, "tenMinAvgWS",(json_object*) json_object_new_int( tenMinAvgWS));
+	json_object_object_add(json, "windDirection",(json_object*) json_object_new_int( windDirection));
+	json_object_object_add(json, "humidity",(json_object*) json_object_new_int( outsideHumidity));
+	json_object_object_add(json, "rainRate",(json_object*) json_object_new_double( rainRate));
+	json_object_object_add(json, "uvIndex",(json_object*) json_object_new_double( uvIndex));
+	json_object_object_add(json, "solarRadiation",(json_object*) json_object_new_int( solarRadiation));
+	json_object_object_add(json, "dayRain",(json_object*)json_object_new_double( dayRain));
+	json_object_object_add(json, "dayET", (json_object*) json_object_new_double( dayET));
 	append(fields, ",Barometer,OutSideTemp,WindSpeed,tenMinAgvWind,WindDir,OutsideHumidity,RainRate,SolarRad,DayRain,DayET,UVIndex");
 	sprintf(buf,",%.3f,%.2f,%u,%d,%u,%d,%.2f,%u,%.2f,%.2f,%.1f",barometer,outtemp,windSpeed,tenMinAvgWS,windDirection,outsideHumidity,rainRate,solarRadiation,dayRain,dayET,uvIndex);
 	append(values,buf);
