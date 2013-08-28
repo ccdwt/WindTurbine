@@ -1,0 +1,19 @@
+<div class="contentBG lower-border">
+  <div class="text">
+  Weather Info
+  </div>
+</div>
+<<br>
+<br>
+
+<div class="contentBG border-curve-3 width-50" style="font-size:.8em" >
+  <div class="margin-5 border-solid-gray border-curve-3 ">  
+    <div class="text" style="text-align:left; position:relative;">
+      <compass-wind deg="data.windDirection"></compass-wind>
+      Barometric pressure: {{clean(data.barometer.toFixed(1))}} mm Hg<br>
+      WindSpeed: <span ng-repeat="val in times(13)">&nbsp;</span>{{clean(data.windSpeed)}} mph <br>
+		temperature:<span ng-repeat="val in times(14)">&nbsp;</span>{{clean(data.temp.toFixed(1))}}&degF {{((data.temp-32) * 5/9).toFixed(1)}}&degC<br>
+		Humidity: <span ng-repeat="val in times(17)">&nbsp;</span>{{clean(data.humidity.toFixed(1))}}%
+</div>
+	</div>
+</div>

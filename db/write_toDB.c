@@ -74,16 +74,23 @@ int main(int argc, char ** argv){
 		values[0] = ' ';
 	}
 	sprintf(cmd,"INSERT INTO Table1 (%s) VALUES (%s);",fields,values);
-
+ 
 #ifdef DEBUG
 	printf ("%s\n",cmd);
 	printf("%s\n", json_object_to_json_string(json));
 	
 #else
-	FILE * json_file = fopen(JSON_FILE,"w");
+	/* Uploads to Paul Martin's hosting */	
+	FILE * ssh = popen("ssh -lmobiushorizons_html-slide ssh.phx.nearlyfreespeech.net 'cat > /home/public/WindWeb/data/data.json'","w");
+	fprintf(ssh, "%s",json_object_to_json_string(json));
+	pclose(ssh);
+	
+
+ 	DBlog(db_file, cmd);
+
+	FILE * json_file = fopen(JSON_FILE , "w");
 	fprintf(json_file, "%s",json_object_to_json_string(json));
 	fclose(json_file);
- 	DBlog(db_file, cmd);
 #endif
 
 }
@@ -199,6 +206,7 @@ int csv(char* input, char ** argv){
 void turbine_logfile(long int now){
 	unsigned int RPM = 0;
 	double PowerOutKw = 0;
+	unsigned int WindSpeed = 0;
 	long int timestamp;
 	char buf[1024];
 	char * argv[78];
@@ -221,7 +229,7 @@ void turbine_logfile(long int now){
 #endif
 				timestamp = atoi(argv[0]);
 #ifdef DEBUG
- 				printf ("%s, %s, %s\n", argv[0],argv[12],argv[18]);
+ 				printf ("%s, %s, %s, %s\n", argv[0],argv[12],argv[18],argv[19]);
 	 			printf ("ts = %d, now = %d\n", timestamp, now);
 #endif
 			}
@@ -231,15 +239,18 @@ void turbine_logfile(long int now){
 			}
 			RPM += (unsigned) atoi(argv[18]);
 			PowerOutKw +=(float) atol(argv[12]) / 1000; // <- W to kW
+			WindSpeed += (unsigned) atoi(argv[19]);
 #ifdef DEBUG
-			printf ("got t=%u,rpm = %u, pout = %d\n", atol(argv[0]), atol(argv[18]), atol(argv[12]));
+			printf ("got t=%u,rpm = %u,ws = %u, pout = %d\n", atol(argv[0]), atol(argv[18]), atol(argv[19]), atol(argv[12]));
 #endif
 			count ++;
 		}	
 		RPM /= count;
 		PowerOutKw /= count;
+		WindSpeed /= count;
 		json_object_object_add(json, "TurbineRPM",json_object_new_int( RPM));
 		json_object_object_add(json, "TurbinePowerOut",json_object_new_double( PowerOutKw));
+		json_object_object_add(json, "TurbineWindSpeed",json_object_new_int( WindSpeed));
 		append(fields, ",RPM,PowerOutKw");
 		sprintf(buf, ",%u,%.3f",RPM, PowerOutKw);
 		append(values, buf);
@@ -370,6 +381,7 @@ void weather_logfile(long int now){
 #endif
 	json_object_object_add(json, "barometer",(json_object *) json_object_new_double( barometer));
 	json_object_object_add(json, "temp",(json_object*) json_object_new_double( outtemp));
+	json_object_object_add(json, "windSpeed",(json_object*) json_object_new_int( windSpeed));
 	json_object_object_add(json, "tenMinAvgWS",(json_object*) json_object_new_int( tenMinAvgWS));
 	json_object_object_add(json, "windDirection",(json_object*) json_object_new_int( windDirection));
 	json_object_object_add(json, "humidity",(json_object*) json_object_new_int( outsideHumidity));

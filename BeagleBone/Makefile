@@ -26,12 +26,12 @@ install_config: hosts
 	@echo "installing the hosts file (local dns)"
 	+$(CP) hosts /etc/hosts
 install_fstab:
-	@echo "removing old refferences to the sd card from fstab"
+	@echo "removing old references to the sd card from fstab"
 	@grep -v "/dev/mmcblk0p1" /etc/fstab > /etc/fstab.new
 	@cp /etc/fstab /etc/fstab.old
 	@mv /etc/fstab.new /etc/fstab
 	@echo "installing fstab (setting sd mount point)"
-	@printf "/dev/mmcblk0p1\t$(DBDIR)\tvfat\tdefaults\t0 0\n" >> /etc/fstab
+	@printf "/dev/mmcblk0p1\t$(INSTALL_BASE)\tvfat\tdefaults\t0 0\n" >> /etc/fstab
 	@mount -a
 clean:
 	rm -f  *~ *.swp *.dtbo

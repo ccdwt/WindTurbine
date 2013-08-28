@@ -6,7 +6,7 @@ build: weather turbine modbus
 
 test: turbine/turbine modbus/test weather/test
 
-clean: weather/clean turbine/clean modbus/clean BeagleBone/clean db/clean monit/clean dropBox/clean
+clean: weather/clean turbine/clean modbus/clean BeagleBone/clean db/clean monit/clean dropBox/clean web/clean
 	rm -rf *~ *.swp
 
 #uninstall: weather/uninstall turbine/uninstall modbus/uninstall BeagleBone/uninstall db/uninstall monit/uninstall dropBox/uninstall
@@ -24,7 +24,7 @@ install_complete:
 install_BBB: warning
 	+$(MAKE) install -C BeagleBone
 
-install_noarch: install_loggers install_db install_backup install_monit
+install_noarch: install_loggers install_db install_backup install_monit install_web
 
 install_loggers: loggers install_modbus install_weather install_turbine
 
@@ -40,6 +40,9 @@ install_test: tests
 install_db: db/install_db db/install_cron
 
 install_backup: dropBox/install
+
+install_web: install_dirs
+	@$(MAKE) install -C web
 
 install_modbus: 
 	@$(MAKE) install_log -C modbus
@@ -146,5 +149,7 @@ dropBox/clean: force
 monit/clean: force
 	+$(MAKE) clean -C utilities/monit
 
+web/clean: force
+	@$(MAKE) clean -C web
 force:
 	true

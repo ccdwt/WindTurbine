@@ -1,0 +1,40 @@
+<style>
+  .compass_img{
+    position: absolute;
+    margin:0px auto;
+    width:50%;
+    height:50%;
+  }
+  .CompassWind{
+    position:relative;
+    width: 5em;
+    height: 5em;
+    overflow:none;
+  }
+.compass_widget{
+  float: right;
+  width: 5em;
+  height: 6em;
+  position:relative;
+}
+.compass_meter_title{
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  text-align: center;
+}
+</style>
+<div class="compass_widget">
+  <div class="CompassWind">
+    <img src="img/wind.png" class="compass_img" style="
+      -moz-transform:rotate({{deg}}deg);
+      -o-transform:rotate({{deg}}deg);
+      -webkit-transform:rotate({{deg}}deg);
+      width:100%;
+      height: 100%;">
+
+    <img src="img/compass.png" class= "compass_img" style="top:25%; left:25%;">
+  </div>
+  <div class="compass_meter_title">{{deg}}&deg N.</div>
+</div>
+

@@ -1,0 +1,51 @@
+
+<style>
+.meter {
+    width:100%;
+    margin:0px auto;
+    position:absolute;
+    bottom: 0px;
+  }
+  .meter-outline{
+    color: white;
+    position:relative;
+    border-style:solid;
+    border-color:black;
+    border-width:1px;
+    margin:0px auto;
+    margin:0px auto;
+  }
+  .img{
+    z-index:0 	;
+    position:absolute;
+    top:0px;
+    left:0px;
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#00FFFFFF,endColorstr=#00FFFFFF)"; /* IE8 */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#00FFFFFF,endColorstr=#00FFFFFF); /* IE6 & IE7 */
+    zoom:1;
+  }
+  .meter-text{
+    position:absolute;
+    left:0px;
+    width:100%;
+    font-size:1.3em;
+    text-align:center;
+
+  }
+  .title{
+    width:1px;
+    display:table;
+  }
+</style>
+<div class="title">
+  <div class="meter-outline" style="height:{{height}}em; width: {{width}}em;">
+    <span class="meter-text">{{max}} {{units}}</span>
+    <div class="meter-text" style="vertical-align:bottom; top:50%;">{{Math.round(value*100)/100}} {{units}}</div>
+    <div class="meter" style="height:{{value/max*100}}%; background-color: {{color}};"></div>
+    <img src="img/cylinder.png" class="img" style="height:{{height}}em; width:{{width}}em;" height="{{height*12}}" width="{{width*12}}">
+  </div>
+
+  <div style="font-size:1.5em"  ng-transclude ></div>
+</div>
+
+

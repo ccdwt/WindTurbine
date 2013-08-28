@@ -1,0 +1,22 @@
+<div class="contentBG lower-border">
+  <div class="text">
+ Turbine Info
+  </div>
+</div>
+<br>
+<br>
+<div class="contentBG border-curve-3 width-40" >
+	<div class="margin-5 border-solid-gray border-curve-3 ">
+    <div class="text" style="text-align:left">
+      Turbine running at {{clean(data.TurbineRPM)}} rpm.<br>
+      Generating {{clean(data.TurbinePowerOut).toFixed(3)}} Kw.<br>
+      Turbine Estimates windspeed {{clean(data.TurbineWindSpeed)}} mph.
+    </div>
+  </div>
+</div>
+
+<div class="contentBG border-curve-3 left-column">
+	<div class="margin-5 border-solid-gray border-curve-3 " style="overflow:none">
+		<embed type="application/x-vlc-plugin" name="Live" autoplay="yes" loop="no" target="rtsp://153.106.112.46/mpeg4/media.amp" />
+	</div>
+</div>
