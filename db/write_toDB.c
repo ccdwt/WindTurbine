@@ -81,7 +81,7 @@ int main(int argc, char ** argv){
 	
 #else
 	/* Uploads to Paul Martin's hosting */	
-	FILE * ssh = popen("ssh -lmobiushorizons_html-slide ssh.phx.nearlyfreespeech.net 'cat > /home/public/WindWeb/data/data.json'","w");
+	FILE * ssh = popen("ssh -o ConnectTimeout=2 -o BatchMode=yes -lmobiushorizons_html-slide ssh.phx.nearlyfreespeech.net 'cat > /home/public/WindWeb/data/data.json'","w");
 	fprintf(ssh, "%s",json_object_to_json_string(json));
 	pclose(ssh);
 	
