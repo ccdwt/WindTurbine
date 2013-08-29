@@ -1,0 +1,19 @@
+<div class="contentBG lower-border">
+  <div class="text">
+	  <h3> Live View </h3>
+  </div>
+</div>
+<br>
+<br>
+<div class="margin-5 contentBG border-solid-gray border-curve-3 " style="width:600px">
+	<div ng-show="hasvlc()" ><embed target="rtsp://153.106.112.46/mpeg4/media.amp" 
+      name="Live Feed"
+      type="application/x-vlc-plugin"
+      width="600" height="600" scale="aspect"
+      autoplay="true" controller="false" loop="false"
+      pluginspage='http://www.videolan.org'>
+      </embed></div>
+      <div ng-show="!hasvlc()" class="text" >You do not have the VLC media Player, please download it from <a href="http://www.videolan.org">www.videolan.org</a></div>
+</div>
+
+

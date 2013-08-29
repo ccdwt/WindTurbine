@@ -1,16 +1,18 @@
 <div class="contentBG lower-border">
   <div class="text">
   <h3>Power Info</h3>
-  The Wind Turbine<br>
-  is currently genereating<br>
-  {{(safeDiv(data.TurbineExport, data.RowlandExport)*100).toFixed(1)}}%<br>
-  Of the House's Requirements
   </div>
 </div>
 <br>
 <br>
-<div class="contentBG distribute_cnt border-curve-3 width-40" >
-  <div class="margin-5 border-solid-gray border-curve-3">
+<div class="margin-5 contentBG width-40 border-solid-gray border-curve-3">
+  <div class="text border-thin-black pad-1" style="margin-bottom: 2.5em;">
+    The Wind Turbine<br>
+    is currently genereating<br>
+    {{clean(safeDiv(data.TurbineExport, data.RowlandExport)*100).toFixed(1)}}%<br>
+    Of the House's Requirements
+  </div>
+  <div class="distribute_cnt">
     <percent-meter class="distribute" val="clean(data.TurbinePowerOut)" max="2.1" color="blue" height="10" width="4" units="kW">Turbine Power Production</percent-meter>
     <percent-meter class="distribute" val="clean(data.TurbineExport)" max="2.1" color="green">Turbine Power Exporting</percent-meter>
     <percent-meter class="distribute" val="clean(Grid)"            max="5"   color="red"  >Grid Power Importing</percent-meter>

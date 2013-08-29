@@ -1,7 +1,7 @@
 body {
   padding: 0px;
   margin: 0px;
-  background: url('../img/windmill.jpg') no-repeat right top fixed;
+  background: url('/img/windmill.jpg') no-repeat right top fixed;
   background-size:cover;
   /*behavior: url('http://html-slide.nfshost.com/WindWeb/css/backgroundsize.min.htc');*/
   font-family:Georgia, serif;
@@ -88,10 +88,12 @@ h3 {
   display: inline-block;
 }
 
+.pad-1{
+	padding: 1em;
+}
+
 .margin-5 {
    padding: 2.5em;
-   border-style: solid;
-   border-color: gray;
 }
 
 .border-curve-3 {
@@ -102,6 +104,13 @@ h3 {
 .border-solid-gray {
   border-style: solid;
   border-color: gray;
+}
+
+.border-thin-black{
+	border-style: solid;
+	border-color: black;
+	border-width: 1px;
+	border-radius: 5px;
 }
 
 .contentBG {
@@ -134,8 +143,9 @@ h3 {
 
 .text {
   color: white;
-  font-size: 2em;
+  font-size: 1.6em;
   text-align: center;
+  margin: 0px auto;
 }
 
 .distribute_cnt {
