@@ -106,8 +106,10 @@ set mailserver smtp.gmail.com port 587
 ## service defined in this file has errors. Alerts may be restricted on 
 ## events by using a filter as in the second example below. 
 #
-set alert calvinwindenergy@gmail.com
-set alert prm5@students.calvin.edu only on {timeout}                      # receive all alerts
+set alert calvinwindenergy@gmail.com 			# receive all alerts
+set alert prm5@students.calvin.edu only on {timeout}    # receive only timeouts                 
+set alert mkh2@calvin.edu only on {timeout}		# ""
+set alert holwerda@calvin.edu only on {timeout}		# ""
 ## Do not alert when Monit start,stop or perform a user initiated action
 # set alert manager@foo.bar not on { instance, action } 
 #
