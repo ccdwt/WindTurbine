@@ -11,6 +11,10 @@
 #define LOGDIR "/usr/src/WindTurbine/logs"
 #endif
 
+#ifndef DB_NAME
+#define DB_NAME "test.db"
+#endif
+
 
 
 char fields [ 1024 ];
@@ -47,7 +51,7 @@ void append (char * orig, char* piece){
 
 int main(int argc, char ** argv){
 	char cmd[2048];
-	char * db_file = DBDIR"/test.db" ;
+	char * db_file = DBDIR"/"DB_NAME ;
 	json = json_object_new_object();
 	kill_other_instances(argv[0]);
 	previous_line(NULL, NULL); // initialize values
@@ -81,7 +85,7 @@ int main(int argc, char ** argv){
 	
 #else
 	/* Uploads to Paul Martin's hosting */	
-	FILE * ssh = popen("ssh -o ConnectTimeout=2 -o BatchMode=yes -lmobiushorizons_html-slide ssh.phx.nearlyfreespeech.net 'cat > /home/public/WindWeb/data/data.json'","w");
+	FILE * ssh = popen("ssh -o ConnectTimeout=2 -o BatchMode=yes -lmobiushorizons_windturbine ssh.phx.nearlyfreespeech.net 'cat > /home/public/data/data.json'","w");
 	fprintf(ssh, "%s",json_object_to_json_string(json));
 	pclose(ssh);
 	

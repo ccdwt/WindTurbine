@@ -3,7 +3,7 @@ include ../make.inc
 all: write
 
 write: write_toDB.c sqlite3 libjson
-	gcc $(CCFLAGS) $(LOG_DEF) $(DB_DEF) $(JSON_DEF) -o write write_toDB.c $(shell pkg-config --libs sqlite3) $(shell pkg-config --cflags --libs json)
+	gcc $(CCFLAGS) $(LOG_DEF) $(DB_DEF) $(JSON_DEF) -D DB_NAME=\"$(DB_NAME)\" -o write write_toDB.c $(shell pkg-config --libs sqlite3) $(shell pkg-config --cflags --libs json)
 
 debug: write_toDB.c sqlite3 libjson
 	gcc $(CCFLAGS) $(LOG_DEF) $(DB_DEF) -o debug write_toDB.c $(shell pkg-config --libs sqlite3) $(shell pkg-config --cflags --libs json) -D DEBUG
