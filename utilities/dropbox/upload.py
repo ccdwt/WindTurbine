@@ -225,8 +225,8 @@ def main():
     except IOError:
         pass # don't worry if it's not there
 
-    from_file = open(os.path.expanduser(DBDIR+"/test.db"), "rb")
-    api_client.put_file("test.db", from_file,True)
+    from_file = open(os.path.expanduser(DBDIR+"/" + DB_NAME), "rb")
+    api_client.put_file(DB_NAME, from_file,True)
 #    term.cmdloop()
 	
 
