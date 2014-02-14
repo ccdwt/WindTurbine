@@ -1,7 +1,7 @@
 body {
   padding: 0px;
   margin: 0px;
-  background: url('/img/windmill.jpg') no-repeat right top fixed;
+  background: url('../img/windmill.jpg') no-repeat right top fixed;
   background-size:cover;
   /*behavior: url('http://html-slide.nfshost.com/WindWeb/css/backgroundsize.min.htc');*/
   font-family:Georgia, serif;
