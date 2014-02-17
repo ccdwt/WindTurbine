@@ -18,7 +18,7 @@ startup:
 
 
 monitrc: rc.m4
-	m4 -D LOGDIR=$(LOGDIR) -D PIDDIR=$(PIDDIR) -D DBDIR=$(DBDIR) rc.m4 > monitrc
+	m4 -D LOGDIR=$(LOGDIR) -D PIDDIR=$(PIDDIR) -D DBDIR=$(DBDIR) -D DBFILE=$(DB_NAME) rc.m4 > monitrc
 	chmod 700 monitrc
 
 make: patch

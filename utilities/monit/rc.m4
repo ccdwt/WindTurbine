@@ -321,7 +321,7 @@ check file weather_logfile with path `'LOGDIR`'/weather_log.csv
   depends on weather_log
 
 #database
-check file db_file with path `'DBDIR`'/test.db
+check file db_file with path `'DBDIR`'/`'DBFILE`'
   if timestamp > 1 hour then alert
 
 #sshd
